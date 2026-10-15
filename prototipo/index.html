@@ -1,0 +1,1120 @@
+<title>La Bóveda del Genio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a single-column "escape room console" — sticky passport on top, one zone on stage at a time,
+   each zone split into a hands-on simulation and a "how it works in the real room" guide. */
+:root{
+  color-scheme: dark;
+  --bg:#0c1416;
+  --panel:#132125;
+  --panel-2:#1b2e33;
+  --line:#2c444a;
+  --device:#060c0e;
+  --screen:#0f1b1e;
+  --fg:#ebf0ea;
+  --muted:#93a8a5;
+  --brass:#e6b052;
+  --brass-ink:#2b1e06;
+  --brass-soft:rgba(230,176,82,.14);
+  --signal:#62d6c1;
+  --signal-soft:rgba(98,214,193,.16);
+  --alert:#f0715f;
+  --paper:#f3eee2;
+  --paper-ink:#1d1a14;
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+.app{max-width:1060px;margin:0 auto;display:grid;gap:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:20px 48px}
+
+/* Header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,42px);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--brass)}
+.chips{display:flex;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.chip small{font-family:var(--body);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+button.chip{cursor:pointer}
+button.chip[aria-pressed="false"]{color:var(--muted)}
+
+/* Step rail */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.steps li{display:grid;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+.steps li::before{content:"";height:4px;border-radius:2px;background:var(--line)}
+.steps .k{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.steps .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps li.done{color:var(--fg)}
+.steps li.done::before{background:var(--signal)}
+.steps li.current{color:var(--brass)}
+.steps li.current::before{background:var(--brass)}
+@media (max-width:560px){.steps .n{display:none}}
+
+/* Passport */
+.passport{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:6px}
+.passport-card{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:10px;align-items:stretch;
+  border:1.5px solid var(--brass);border-radius:14px;padding:10px;background:linear-gradient(var(--brass-soft),var(--brass-soft)),var(--panel)}
+.passport-title{display:grid;align-content:center;padding-inline:6px 8px;border-right:1px dashed var(--line)}
+.passport-title b{font-family:var(--display);font-size:17px;line-height:1}
+.passport-title span{font-size:11px;color:var(--muted)}
+.slot{border:1.5px dashed var(--line);border-radius:10px;padding:6px 10px;min-width:0;display:grid;gap:2px}
+.slot small{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.slot b{font-family:var(--mono);font-size:20px;line-height:1.1;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.slot.stamped{border-style:solid;border-color:var(--brass)}
+.slot.stamped b{color:var(--brass);animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stamp{from{transform:scale(1.9) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:560px){
+  .passport-card{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .passport-title{display:none}
+  .slot b{font-size:17px}
+}
+
+/* Screens */
+.screen{display:grid;gap:16px;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+.zone-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.zone-tag{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--bg);background:var(--brass);border-radius:6px;padding:3px 8px}
+h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;margin:0;letter-spacing:-.01em}
+.zone-meta{color:var(--muted);font-size:13px}
+.mission{margin:0;font-size:16px;max-width:62ch}
+.zone-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:820px){.zone-grid{grid-template-columns:minmax(0,1fr)}}
+.sim{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:14px;min-width:0;position:relative;overflow:hidden}
+.real{display:grid;gap:12px;align-content:start;min-width:0;padding:4px 2px}
+.real h3{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+.real p{margin:0;color:var(--fg);max-width:60ch}
+.real .device-tag{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--signal);border:1px solid var(--signal-soft);background:var(--signal-soft);border-radius:6px;padding:2px 8px;margin:2px 4px 2px 0}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tasks li{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;color:var(--muted)}
+.tasks li::before{content:"";width:18px;height:18px;margin-top:2px;border-radius:50%;border:2px solid var(--line)}
+.tasks li.current{color:var(--fg)}
+.tasks li.current::before{border-color:var(--brass);box-shadow:0 0 0 4px var(--brass-soft)}
+.tasks li.done{color:var(--fg)}
+.tasks li.done::before{border-color:var(--signal);background:var(--signal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%230c1416' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.next-row{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+
+/* Buttons */
+.btn{appearance:none;border:1.5px solid var(--line);background:var(--panel-2);border-radius:12px;padding:11px 16px;font-weight:600;cursor:pointer;transition:transform .12s,background .2s,border-color .2s;text-align:center}
+.btn:hover:not(:disabled){border-color:var(--muted)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{background:var(--brass);border-color:var(--brass);color:var(--brass-ink)}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn.go{background:var(--signal);border-color:var(--signal);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--muted);font-weight:500;padding:8px 12px;font-size:13px;justify-self:start}
+.btn.pulse:not(:disabled){animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--brass-soft)}50%{box-shadow:0 0 0 8px var(--brass-soft)}}
+.reveal{appearance:none;border:2px solid var(--brass);background:var(--brass-soft);color:var(--brass);font-family:var(--mono);font-weight:700;border-radius:8px;padding:0 8px;cursor:pointer;animation:pulse 1.4s infinite}
+.reveal.used{animation:none;opacity:.6;cursor:default}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.hint.err{color:var(--alert)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* Briefing */
+.brief{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:center}
+@media (max-width:760px){.brief{grid-template-columns:minmax(0,1fr)}.brief-art{order:-1;max-width:260px;justify-self:center}}
+.premise{font-family:var(--display);font-size:clamp(20px,3vw,26px);line-height:1.25;font-weight:500;margin:0;text-wrap:balance}
+.premise b{color:var(--brass);font-weight:700}
+.plan{list-style:none;padding:0;margin:0;display:grid;gap:0;border-top:1px solid var(--line)}
+.plan li{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.plan .z{font-family:var(--mono);font-weight:700;color:var(--brass)}
+.plan .d{color:var(--muted);font-size:13px}
+.plan .m{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.brief-art svg{width:100%;height:auto;display:block}
+.v-frame{fill:var(--panel-2);stroke:var(--line);stroke-width:2}
+.v-door{fill:var(--panel);stroke:var(--brass);stroke-width:4}
+.v-ring{fill:none;stroke:var(--line);stroke-width:2}
+.v-bolt{fill:var(--brass)}
+.v-handle{fill:none;stroke:var(--brass);stroke-width:7;stroke-linecap:round}
+.v-hub{fill:var(--brass)}
+.v-glow{fill:var(--brass);opacity:.18}
+.lamp{fill:var(--brass)}
+.lamp-line{fill:none;stroke:var(--brass);stroke-width:4;stroke-linecap:round}
+.smoke{fill:none;stroke:var(--signal);stroke-width:3;stroke-linecap:round;opacity:.8}
+
+/* Devices */
+.devices{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:center}
+.phone{width:min(250px,100%);background:var(--device);border:2px solid var(--line);border-radius:30px;padding:9px;position:relative}
+.phone::before{content:"";position:absolute;top:13px;left:50%;width:46px;height:5px;margin-left:-23px;border-radius:3px;background:var(--line)}
+.phone-screen{background:var(--screen);border-radius:22px;min-height:360px;padding:26px 14px 14px;display:grid;gap:10px;align-content:start}
+.app-bar{font-size:12px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.app-bar .live{color:var(--alert)}
+.app-bar .live.ok{color:var(--signal)}
+#waveA{width:100%;height:64px;display:block;border-radius:10px;background:var(--panel)}
+.noise-label{font-family:var(--mono);font-size:11px;color:var(--alert);margin:0}
+.noise-label.ok{color:var(--signal)}
+.tr{display:grid;gap:4px}
+.tr small{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.tr p{margin:0;min-height:3.2em;font-size:14px;line-height:1.4}
+.tr .es{color:var(--fg);font-weight:600}
+.controls{display:grid;gap:10px;width:min(260px,100%)}
+.buds{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.buds svg{width:62px;height:auto;flex:none}
+.bud{fill:var(--fg)}
+.anc-wave{fill:none;stroke:var(--signal);stroke-width:2;opacity:0;transition:opacity .4s}
+.buds.on .anc-wave{opacity:1;animation:ancp 1.8s ease-out infinite}
+@keyframes ancp{from{opacity:.9}to{opacity:.15}}
+.buds b{display:block;font-size:13px}
+.buds span{font-size:12px;color:var(--alert)}
+.buds.on span{color:var(--signal)}
+
+/* Zone B */
+.seats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.seat{appearance:none;background:none;border:0;padding:0;cursor:pointer;display:grid;justify-items:center;gap:4px;color:var(--muted);font-size:12px}
+.seat-box{position:relative;width:100%;max-width:110px;aspect-ratio:1/1.05}
+.under{position:absolute;left:8%;right:8%;bottom:16%;height:44%;border-radius:8px;background:var(--device);display:grid;place-items:center;font-size:11px;color:var(--muted);overflow:hidden}
+.under canvas{width:72%;height:auto;image-rendering:pixelated;border-radius:2px}
+.cushion{position:absolute;left:4%;right:4%;bottom:14%;height:48%;border-radius:12px 12px 8px 8px;background:var(--panel-2);border:2px solid var(--line);transition:transform .45s cubic-bezier(.3,1.4,.5,1);transform-origin:50% 0}
+.backrest{position:absolute;left:12%;right:12%;top:0;height:40%;border-radius:12px 12px 4px 4px;background:var(--panel-2);border:2px solid var(--line)}
+.legs{position:absolute;left:14%;right:14%;bottom:0;height:16%;border-left:4px solid var(--line);border-right:4px solid var(--line)}
+.seat.lifted .cushion{transform:translateY(-62%) rotateX(55deg);opacity:.55}
+.seat.found .seat-box{filter:drop-shadow(0 0 10px var(--brass-soft))}
+.seat.found{color:var(--brass)}
+.tablet{background:var(--device);border:2px solid var(--line);border-radius:22px;padding:12px;width:100%;max-width:560px;justify-self:center}
+.tablet-screen{position:relative;background:var(--screen);border-radius:12px;overflow:hidden;aspect-ratio:4/3}
+#maze{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.scanline{position:absolute;left:0;right:0;height:3px;background:var(--signal);box-shadow:0 0 18px var(--signal);top:0;animation:scan 1.3s linear infinite}
+@keyframes scan{to{top:100%}}
+.scan-label{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--signal)}
+.maze-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.maze-bar .hint{flex:1;min-width:160px}
+
+/* Zone C */
+.link-stage{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;align-items:end}
+@media (max-width:620px){.link-stage{grid-template-columns:minmax(0,1fr)}}
+.laptop{width:100%;max-width:460px;justify-self:center}
+.laptop-screen{width:92%;margin:0 auto;aspect-ratio:16/10;background:var(--screen);border:10px solid var(--device);border-bottom-width:14px;border-radius:14px 14px 4px 4px;display:grid;place-items:center;text-align:center;padding:10px;overflow:hidden}
+.laptop-base{height:38px;background:var(--panel-2);border:2px solid var(--line);border-top:0;border-radius:0 0 18px 18px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;gap:8px}
+.laptop-base .label{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.touchpad{width:30%;height:18px;border:1.5px solid var(--line);border-radius:5px}
+.onehop{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--signal);border:1.5px dashed var(--signal);border-radius:8px;padding:4px 8px;transition:all .2s;white-space:nowrap}
+.onehop.hot{background:var(--signal);color:var(--bg);box-shadow:0 0 0 6px var(--signal-soft)}
+.onehop.ping{animation:ping .7s ease-out 2}
+@keyframes ping{from{box-shadow:0 0 0 0 var(--signal)}to{box-shadow:0 0 0 22px transparent}}
+.lock{display:grid;gap:6px;justify-items:center}
+.lock svg{width:34px;height:34px}
+.lock b{font-family:var(--display);font-size:16px}
+.lock span{font-size:12px;color:var(--muted)}
+.recv{display:grid;gap:8px;width:80%;justify-items:center;font-family:var(--mono);font-size:12px;color:var(--signal)}
+.bar{width:100%;height:8px;border-radius:4px;background:var(--panel-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--signal);transition:width 1.3s ease}
+.unlocked{display:grid;gap:4px;justify-items:center}
+.unlocked span{font-size:12px;color:var(--muted)}
+.reveal.big{font-family:var(--display);font-size:clamp(56px,10vw,84px);line-height:1;padding:4px 22px;border-radius:14px}
+.phone.small{width:min(210px,100%);justify-self:center;transition:transform .35s ease;touch-action:auto}
+.phone.small .phone-screen{min-height:300px}
+.phone.small.draggable{cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 0 0 3px var(--signal-soft)}
+.phone.small.dragging{cursor:grabbing;transition:none;z-index:4}
+.note-input{width:100%;background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:10px;color:var(--fg);font-family:var(--mono);font-size:16px;text-transform:uppercase}
+.note-input:focus{border-color:var(--brass);outline:none}
+.mini-label{font-size:11px;color:var(--muted)}
+.file{display:flex;align-items:center;gap:8px;border:1px solid var(--signal);background:var(--signal-soft);border-radius:10px;padding:8px 10px;font-family:var(--mono);font-size:13px;color:var(--signal)}
+.file svg{width:18px;height:18px;flex:none}
+.textlink{appearance:none;background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:12px;cursor:pointer;justify-self:start}
+
+/* Zone D */
+.vault-wrap{display:grid;gap:16px;justify-items:center;position:relative}
+.vault{position:relative;width:min(300px,100%);aspect-ratio:1;perspective:1000px}
+.vault-inside{position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle at 50% 55%,var(--brass-soft),var(--device) 70%);display:grid;place-items:center;border:3px solid var(--line)}
+.vault-inside svg{width:55%}
+.vault-door{position:absolute;inset:0;transform-origin:4% 50%;transition:transform 1.3s cubic-bezier(.5,0,.2,1)}
+.vault-door svg{width:100%;height:100%;display:block}
+.vault-door .spin{transform-origin:120px 120px;transition:transform .9s ease}
+.vault.unlocking .vault-door .spin{transform:rotate(200deg)}
+.vault.open .vault-door{transform:rotateY(-108deg)}
+.combo{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.combo span{min-width:64px;padding:8px 12px;text-align:center;border:1.5px dashed var(--line);border-radius:10px;font-family:var(--mono);font-weight:700;font-size:18px;color:var(--muted)}
+.combo span.in{border-style:solid;border-color:var(--signal);color:var(--signal)}
+.victory{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+@media (max-width:640px){.victory{grid-template-columns:minmax(0,1fr)}}
+.victory h3{font-family:var(--display);font-size:clamp(26px,4vw,34px);margin:0 0 6px;color:var(--brass);line-height:1.05}
+.prizes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.prize{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--panel-2)}
+.prize b{display:block;font-family:var(--display);font-size:16px}
+.prize span{font-size:12px;color:var(--muted)}
+.coupon{border:1.5px dashed var(--brass)}
+.coupon b{color:var(--brass);font-family:var(--mono)}
+.polaroid{background:var(--paper);color:var(--paper-ink);padding:10px 10px 12px;width:min(250px,100%);transform:rotate(-2.5deg);box-shadow:0 14px 30px rgba(0,0,0,.4);justify-self:center;border-radius:3px}
+.polaroid svg{display:block;width:100%;height:auto;border-radius:2px}
+.polaroid p{margin:8px 2px 0;font-family:var(--display);font-weight:700;font-size:15px;line-height:1.2}
+.polaroid small{font-family:var(--mono);font-size:11px;opacity:.7}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:fall 1.8s ease-in forwards}
+@keyframes fall{to{transform:translateY(420px) rotate(540deg);opacity:0}}
+
+/* Summary */
+.summary{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.summary th,.summary td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.summary th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.summary td.num{font-family:var(--mono);white-space:nowrap}
+.summary tfoot td{font-weight:700;border-bottom:0}
+.table-wrap{overflow-x:auto}
+.foot{font-size:12px;color:var(--muted);margin:8px 0 0}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Prototipo · Escape room por zonas</p>
+      <h1>La Bóveda <em>del Genio</em></h1>
+    </div>
+    <div class="chips">
+      <span class="chip"><small>Tu tiempo</small><span id="clock">0:00</span></span>
+      <button class="chip" id="soundBtn" type="button" aria-pressed="true">Sonido: sí</button>
+    </div>
+  </header>
+
+  <ol class="steps" id="steps" aria-label="Recorrido">
+    <li><span class="k">Inicio</span><span class="n">Briefing</span></li>
+    <li><span class="k">Zona A</span><span class="n">El mensaje</span></li>
+    <li><span class="k">Zona B</span><span class="n">El trazo</span></li>
+    <li><span class="k">Zona C</span><span class="n">El enlace</span></li>
+    <li><span class="k">Zona D</span><span class="n">La bóveda</span></li>
+  </ol>
+
+  <section class="passport" aria-label="Pasaporte">
+    <div class="passport-card">
+      <div class="passport-title"><b>Pasaporte</b><span>3 claves</span></div>
+      <div class="slot" id="slot0"><small>1 · Número</small><b>—</b></div>
+      <div class="slot" id="slot1"><small>2 · Palabra</small><b>—</b></div>
+      <div class="slot" id="slot2"><small>3 · Dígito</small><b>—</b></div>
+    </div>
+  </section>
+
+  <main id="stage">
+
+    <!-- BRIEFING -->
+    <section class="screen" data-screen="brief">
+      <div class="brief">
+        <div style="display:grid;gap:18px;min-width:0">
+          <p class="eyebrow">Briefing del Game Master · 2 min</p>
+          <p class="premise">El Genio de HONOR quedó atrapado en la Bóveda. Tienen <b>12 minutos</b> para liberarlo consiguiendo tres claves: <b>un número</b>, <b>una palabra</b> y <b>un archivo final</b>.</p>
+          <ul class="plan">
+            <li><span class="z">A</span><span>El mensaje<br><span class="d">HONOR 600 Pro + Earbuds 3 Pro</span></span><span class="m">4 min</span></li>
+            <li><span class="z">B</span><span>El trazo<br><span class="d">HONOR Pad 10 + Stylus</span></span><span class="m">4 min</span></li>
+            <li><span class="z">C</span><span>El enlace<br><span class="d">HONOR MagicBook Pro 14 + 600 Pro</span></span><span class="m">4 min</span></li>
+            <li><span class="z">D</span><span>La bóveda del Genio<br><span class="d">Cofre físico con candado</span></span><span class="m">1 min</span></li>
+          </ul>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <button class="btn primary pulse" id="startBtn" type="button">Recibir pasaporte y empezar</button>
+            <span class="hint">Esta versión de prueba dura unos 2 o 3 minutos.</span>
+          </div>
+        </div>
+        <div class="brief-art" aria-hidden="true">
+          <svg viewBox="0 0 240 240">
+            <rect class="v-frame" x="12" y="12" width="216" height="216" rx="22"/>
+            <circle class="v-glow" cx="120" cy="120" r="100"/>
+            <circle class="v-door" cx="120" cy="120" r="84"/>
+            <circle class="v-ring" cx="120" cy="120" r="62"/>
+            <g id="bolts"></g>
+            <g class="v-handle"><line x1="120" y1="84" x2="120" y2="156"/><line x1="89" y1="102" x2="151" y2="138"/><line x1="89" y1="138" x2="151" y2="102"/></g>
+            <circle class="v-hub" cx="120" cy="120" r="14"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONA A -->
+    <section class="screen" data-screen="a" hidden>
+      <div class="zone-head"><span class="zone-tag">Zona A</span><h2>El mensaje</h2><span class="zone-meta">Celular + audífonos · 4 min en sala</span></div>
+      <p class="mission">Hay mucho ruido en la sala. Aísla el audio, escúchalo en inglés y deja que la IA lo traduzca para encontrar el número escondido.</p>
+      <div class="zone-grid">
+        <div class="sim">
+          <div class="devices">
+            <div class="phone">
+              <div class="phone-screen">
+                <div class="app-bar"><span>Traducción IA</span><span class="live" id="liveA">● ruido</span></div>
+                <canvas id="waveA" aria-hidden="true"></canvas>
+                <p class="noise-label" id="noiseLabel">Ruido ambiente: ALTO</p>
+                <div class="tr"><small>EN · AUDIO</small><p id="enText" class="en"></p></div>
+                <div class="tr"><small>ES · TRADUCCIÓN</small><p id="esText" class="es"></p></div>
+              </div>
+            </div>
+            <div class="controls">
+              <div class="buds" id="buds">
+                <svg viewBox="0 0 90 56" aria-hidden="true">
+                  <path class="anc-wave" d="M6 6 Q-2 20 6 34"/><path class="anc-wave" d="M84 6 Q92 20 84 34"/>
+                  <circle class="bud" cx="24" cy="16" r="11"/><rect class="bud" x="27" y="16" width="7" height="30" rx="3.5"/>
+                  <circle class="bud" cx="66" cy="16" r="11"/><rect class="bud" x="56" y="16" width="7" height="30" rx="3.5"/>
+                </svg>
+                <div><b>Earbuds 3 Pro</b><span id="ancState">ANC apagado</span></div>
+              </div>
+              <button class="btn primary pulse" id="ancBtn" type="button">1. Ponerse audífonos y activar ANC</button>
+              <button class="btn" id="playBtn" type="button" disabled>2. Reproducir audio</button>
+              <button class="btn" id="transBtn" type="button" disabled>3. Traducir con IA</button>
+              <p class="hint" id="hintA">Activa sonido arriba para escuchar el ruido y el audio.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="real">
+          <h3>En la sala real</h3>
+          <p>Suena ruido ambiente distractor. El equipo se pone los audífonos con Cancelación de Ruido Activa (ANC) para escuchar un audio rápido en inglés y usa la traducción con IA en vivo del teléfono para transcribirlo al español.</p>
+          <div><span class="device-tag">HONOR 600 Pro</span><span class="device-tag">Earbuds 3 Pro</span></div>
+          <ol class="tasks" data-zone="a">
+            <li>Activar ANC</li>
+            <li>Escuchar el audio en inglés</li>
+            <li>Traducir con IA en vivo</li>
+            <li>Anotar el número en la casilla 1</li>
+          </ol>
+          <button class="btn ghost" type="button" data-skip="a">Saltar esta zona (modo guía)</button>
+        </aside>
+      </div>
+      <div class="next-row"><button class="btn go" type="button" data-next="b" hidden>Ir a Zona B: El trazo →</button></div>
+    </section>
+
+    <!-- ZONA B -->
+    <section class="screen" data-screen="b" hidden>
+      <div class="zone-head"><span class="zone-tag">Zona B</span><h2>El trazo</h2><span class="zone-meta">Tablet + stylus · 4 min en sala</span></div>
+      <p class="mission" id="missionB">Hay un código QR escondido debajo de uno de los asientos. Levántalos hasta encontrarlo.</p>
+      <div class="zone-grid">
+        <div class="sim">
+          <div class="seats" id="seats"></div>
+          <button class="btn primary pulse" id="scanBtn" type="button" hidden>Escanear QR con HONOR Pad 10</button>
+          <div id="tabletWrap" hidden>
+            <div class="tablet">
+              <div class="tablet-screen">
+                <canvas id="maze" aria-label="Laberinto para trazar con el stylus"></canvas>
+                <div id="scanning"><div class="scanline"></div><div class="scan-label">Abriendo plano en HONOR Notes…</div></div>
+              </div>
+            </div>
+            <div class="maze-bar">
+              <p class="hint" id="mazeMsg">Pon el dedo o el mouse en el punto verde y sigue el camino sin salirte.</p>
+              <span id="wordSlot"></span>
+            </div>
+          </div>
+        </div>
+        <aside class="real">
+          <h3>En la sala real</h3>
+          <p>El equipo encuentra un QR debajo de un asiento. Al escanearlo con la tablet se abre un laberinto en HONOR Notes. Con la precisión del stylus trazan el camino sin salirse de las líneas, y el trazo forma la palabra clave.</p>
+          <div><span class="device-tag">HONOR Pad 10</span><span class="device-tag">Stylus</span></div>
+          <ol class="tasks" data-zone="b">
+            <li>Encontrar el QR bajo un asiento</li>
+            <li>Escanearlo con la tablet</li>
+            <li>Trazar el camino con el stylus</li>
+            <li>Anotar la palabra en la casilla 2</li>
+          </ol>
+          <button class="btn ghost" type="button" data-skip="b">Saltar esta zona (modo guía)</button>
+        </aside>
+      </div>
+      <div class="next-row"><button class="btn go" type="button" data-next="c" hidden>Ir a Zona C: El enlace →</button></div>
+    </section>
+
+    <!-- ZONA C -->
+    <section class="screen" data-screen="c" hidden>
+      <div class="zone-head"><span class="zone-tag">Zona C</span><h2>El enlace</h2><span class="zone-meta">Laptop + celular · 4 min en sala</span></div>
+      <p class="mission">La laptop está bloqueada. Escribe la palabra clave en una nota del celular y envíala acercando el teléfono a la laptop.</p>
+      <div class="zone-grid">
+        <div class="sim">
+          <div class="link-stage">
+            <div class="laptop">
+              <div class="laptop-screen">
+                <div class="lock" id="lapLock">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  <b>MagicBook Pro 14</b>
+                  <span>Bloqueada · esperando archivo</span>
+                </div>
+                <div class="recv" id="lapRecv" hidden><span>Recibiendo GENIO.note…</span><div class="bar"><i id="recvBar"></i></div></div>
+                <div class="unlocked" id="lapOpen" hidden><span>Desbloqueada · dígito final</span><button class="reveal big" id="digitC" type="button">7</button><span>Toca el dígito para anotarlo</span></div>
+              </div>
+              <div class="laptop-base"><span class="label">MagicBook</span><span class="touchpad"></span><span class="onehop" id="hopZone">◉ OneHop</span></div>
+            </div>
+            <div class="phone small" id="phoneC">
+              <div class="phone-screen">
+                <div class="app-bar"><span>Notas</span><span>600 Pro</span></div>
+                <label class="mini-label" for="noteInput">Nota rápida</label>
+                <input class="note-input" id="noteInput" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Palabra clave">
+                <button class="btn primary" id="saveNote" type="button">Guardar nota</button>
+                <button class="textlink" id="fillNote" type="button">Copiar del pasaporte</button>
+                <div class="file" id="fileChip" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h8l5 5v15H6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 2v5h5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                  GENIO.note
+                </div>
+                <p class="hint" id="hintC"></p>
+              </div>
+            </div>
+          </div>
+          <button class="btn" id="tapBtn" type="button" hidden>Hacer el choque OneHop (sin arrastrar)</button>
+        </div>
+        <aside class="real">
+          <h3>En la sala real</h3>
+          <p>El equipo escribe la palabra obtenida en una nota rápida del HONOR 600 Pro. Luego usa la Transferencia OneHop / OneTap, un toque físico entre el teléfono y la laptop, para enviar el archivo sin cables. Al recibirlo, la laptop se desbloquea y muestra el dígito final en grande.</p>
+          <div><span class="device-tag">HONOR MagicBook Pro 14</span><span class="device-tag">HONOR 600 Pro</span></div>
+          <ol class="tasks" data-zone="c">
+            <li>Escribir la palabra en una nota</li>
+            <li>Acercar el teléfono a la laptop (OneHop)</li>
+            <li>Ver el dígito en la laptop</li>
+            <li>Anotar el dígito en la casilla 3</li>
+          </ol>
+          <button class="btn ghost" type="button" data-skip="c">Saltar esta zona (modo guía)</button>
+        </aside>
+      </div>
+      <div class="next-row"><button class="btn go" type="button" data-next="d" hidden>Ir a la Bóveda →</button></div>
+    </section>
+
+    <!-- ZONA D -->
+    <section class="screen" data-screen="d" hidden>
+      <div class="zone-head"><span class="zone-tag">Zona D</span><h2>La bóveda del Genio</h2><span class="zone-meta">Cofre físico · 1 min en sala</span></div>
+      <p class="mission">Con el pasaporte completo, ingresa la combinación para abrir la bóveda.</p>
+      <div class="zone-grid">
+        <div class="sim">
+          <div class="vault-wrap" id="vaultWrap">
+            <div class="vault" id="vault">
+              <div class="vault-inside" aria-hidden="true">
+                <svg viewBox="0 0 120 80"><path class="smoke" d="M58 28 C48 18 68 14 58 2"/><ellipse class="lamp" cx="56" cy="33" rx="12" ry="4"/><path class="lamp" d="M20 52 C20 40 40 34 60 34 C78 34 86 40 92 44 L112 34 C115 33 117 36 114 38 L96 54 C90 62 76 66 60 66 C38 66 20 62 20 52 Z"/><path class="lamp-line" d="M22 50 C6 50 6 34 20 38"/><rect class="lamp" x="44" y="66" width="28" height="6" rx="2"/></svg>
+              </div>
+              <div class="vault-door" aria-hidden="true">
+                <svg viewBox="0 0 240 240">
+                  <circle class="v-door" cx="120" cy="120" r="114"/>
+                  <circle class="v-ring" cx="120" cy="120" r="88"/>
+                  <g class="bolts-d"></g>
+                  <g class="spin"><g class="v-handle"><line x1="120" y1="72" x2="120" y2="168"/><line x1="78" y1="96" x2="162" y2="144"/><line x1="78" y1="144" x2="162" y2="96"/></g><circle class="v-hub" cx="120" cy="120" r="18"/></g>
+                </svg>
+              </div>
+            </div>
+            <div class="combo" aria-label="Combinación"><span id="c0">—</span><span id="c1">—</span><span id="c2">—</span></div>
+            <button class="btn primary pulse" id="comboBtn" type="button">Ingresar combinación</button>
+            <div class="confetti" id="confetti"></div>
+          </div>
+          <div class="victory" id="victory" hidden>
+            <div>
+              <h3>¡Genio liberado!</h3>
+              <p style="margin:0">La bóveda se abre y revela el merchandising y los cupones de descuento. El equipo cierra con la foto grupal de victoria.</p>
+              <div class="prizes">
+                <div class="prize"><b>Merch HONOR</b><span>Para cada integrante</span></div>
+                <div class="prize coupon"><b>CUPÓN</b><span>Descuento en equipos</span></div>
+              </div>
+            </div>
+            <figure class="polaroid" style="margin:0">
+              <svg viewBox="0 0 200 150" aria-hidden="true">
+                <rect width="200" height="150" fill="#1b2e33"/>
+                <circle cx="100" cy="150" r="70" fill="#e6b052" opacity=".25"/>
+                <g fill="#62d6c1"><circle cx="46" cy="70" r="15"/><rect x="26" y="88" width="40" height="70" rx="18"/></g>
+                <g fill="#e6b052"><circle cx="82" cy="62" r="16"/><rect x="61" y="81" width="42" height="80" rx="19"/></g>
+                <g fill="#ebf0ea"><circle cx="120" cy="64" r="15"/><rect x="100" y="82" width="40" height="78" rx="18"/></g>
+                <g fill="#f0715f"><circle cx="156" cy="72" r="14"/><rect x="137" y="89" width="38" height="70" rx="17"/></g>
+                <path d="M20 40 L32 28 M180 36 L168 24 M100 20 L100 8" stroke="#e6b052" stroke-width="4" stroke-linecap="round"/>
+              </svg>
+              <p>Foto de victoria</p>
+              <small id="photoCaption">24 · GENIO · 7</small>
+            </figure>
+          </div>
+        </div>
+        <aside class="real">
+          <h3>En la sala real</h3>
+          <p>El equipo llega frente a un cofre con candado y su pasaporte completo. Ingresan la combinación 24-GENIO-7, o el Game Master la valida en persona con la técnica del Mago de Oz. Dentro están el merch y los cupones.</p>
+          <ol class="tasks" data-zone="d">
+            <li>Ingresar la combinación</li>
+            <li>Abrir la bóveda</li>
+            <li>Recibir merch y cupones</li>
+            <li>Foto grupal de victoria</li>
+          </ol>
+        </aside>
+      </div>
+      <div class="next-row"><button class="btn go" type="button" data-next="end" hidden>Ver resumen del recorrido →</button></div>
+    </section>
+
+    <!-- RESUMEN -->
+    <section class="screen" data-screen="end" hidden>
+      <div class="zone-head"><span class="zone-tag">Fin</span><h2>Resumen del recorrido</h2></div>
+      <p class="mission">Así se compara tu recorrido en el prototipo con los tiempos planificados para la activación en sala.</p>
+      <div class="sim">
+        <div class="table-wrap">
+          <table class="summary">
+            <thead><tr><th>Etapa</th><th>Equipo HONOR</th><th>Clave</th><th>En sala</th><th>Tu tiempo</th></tr></thead>
+            <tbody id="sumBody"></tbody>
+            <tfoot><tr><td>Total</td><td></td><td id="sumCombo">—</td><td class="num">14:00</td><td class="num" id="sumTotal">—</td></tr></tfoot>
+          </table>
+        </div>
+        <p class="foot">En sala: 2 minutos de briefing + 12 minutos de juego desde que el equipo recibe el pasaporte.</p>
+        <div class="next-row" style="justify-content:flex-start"><button class="btn primary" id="restartBtn" type="button">Volver a empezar</button></div>
+      </div>
+    </section>
+
+  </main>
+  <p class="foot">Prototipo de una propuesta de activación universitaria, hecho para pruebas con usuarios. No es material oficial de HONOR.</p>
+</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const ORDER = ['brief','a','b','c','d','end'];
+  const ZONES = ['a','b','c','d'];
+  const state = { screen:'brief', passport:[null,null,null], times:{}, zoneStart:0, t0:0, tEnd:0, sound:true };
+  let epoch = 0; // bumps on every screen change so stale async work stops
+
+  /* ---------- formatting & clock ---------- */
+  const fmt = ms => { const s = Math.max(0, Math.round(ms/1000)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+  setInterval(() => {
+    if (!state.t0) { $('#clock').textContent = '0:00'; return; }
+    $('#clock').textContent = fmt((state.tEnd || performance.now()) - state.t0);
+  }, 250);
+
+  /* ---------- audio ---------- */
+  let actx = null, noiseSrc = null, noiseGain = null;
+  function audio(){
+    if (!state.sound) return null;
+    try { if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume().catch(()=>{}); } catch(e){ actx = null; }
+    return actx;
+  }
+  function startNoise(level){
+    const c = audio(); if (!c || noiseSrc) return;
+    try {
+      const len = c.sampleRate * 2, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      let last = 0;
+      for (let i = 0; i < len; i++){ const w = Math.random()*2-1; last = (last + 0.03*w)/1.03; d[i] = last*3 + w*0.08; }
+      noiseSrc = c.createBufferSource(); noiseSrc.buffer = buf; noiseSrc.loop = true;
+      noiseGain = c.createGain(); noiseGain.gain.value = level;
+      noiseSrc.connect(noiseGain).connect(c.destination); noiseSrc.start();
+    } catch(e){ noiseSrc = null; }
+  }
+  function stopNoise(){ try { noiseSrc && noiseSrc.stop(); } catch(e){} noiseSrc = null; noiseGain = null; }
+  function beep(freq = 660, dur = .12, delay = 0){
+    const c = audio(); if (!c) return;
+    try {
+      const t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+      o.type = 'triangle'; o.frequency.value = freq;
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.16, t+.01); g.gain.exponentialRampToValueAtTime(.0001, t+dur);
+      o.connect(g).connect(c.destination); o.start(t); o.stop(t+dur+.02);
+    } catch(e){}
+  }
+  function speak(text){
+    return new Promise(res => {
+      if (!state.sound || !('speechSynthesis' in window)) return res();
+      try {
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = .95;
+        u.onend = res; u.onerror = res; speechSynthesis.cancel(); speechSynthesis.speak(u);
+        setTimeout(res, 8000);
+      } catch(e){ res(); }
+    });
+  }
+  $('#soundBtn').addEventListener('click', () => {
+    state.sound = !state.sound;
+    $('#soundBtn').setAttribute('aria-pressed', String(state.sound));
+    $('#soundBtn').textContent = 'Sonido: ' + (state.sound ? 'sí' : 'no');
+    if (!state.sound){ stopNoise(); try { speechSynthesis.cancel(); } catch(e){} }
+    else if (state.screen === 'a') startNoise(anc ? .004 : .12);
+  });
+
+  /* ---------- helpers ---------- */
+  async function typeText(el, text, speed = 26){
+    const my = epoch; el.textContent = '';
+    if (reduce){ el.textContent = text; return; }
+    for (let i = 0; i < text.length; i++){ if (my !== epoch) return; el.textContent += text[i]; await wait(speed); }
+  }
+  function tasks(z, doneCount){
+    $$('.tasks[data-zone="'+z+'"] li').forEach((li,i) => {
+      li.classList.toggle('done', i < doneCount);
+      li.classList.toggle('current', i === doneCount);
+    });
+  }
+  function stamp(i, value){
+    state.passport[i] = value;
+    const s = $('#slot'+i); s.classList.remove('stamped'); void s.offsetWidth;
+    s.querySelector('b').textContent = value; s.classList.add('stamped');
+    beep(520, .1); beep(780, .16, .09);
+  }
+  function clearPassport(){
+    state.passport = [null,null,null];
+    [0,1,2].forEach(i => { const s = $('#slot'+i); s.classList.remove('stamped'); s.querySelector('b').textContent = '—'; });
+  }
+  function showNext(z){ const b = document.querySelector('.screen[data-screen="'+z+'"] [data-next]'); if (b){ b.hidden = false; b.focus({preventScroll:true}); } }
+  function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+
+  /* ---------- navigation ---------- */
+  const setup = {};
+  function go(name){
+    const now = performance.now();
+    if (ZONES.includes(state.screen) && state.zoneStart) state.times[state.screen] = (state.times[state.screen] || 0) + (now - state.zoneStart);
+    epoch++;
+    state.screen = name; state.zoneStart = now;
+    $$('.screen').forEach(s => s.hidden = s.dataset.screen !== name);
+    const idx = ORDER.indexOf(name);
+    $$('#steps li').forEach((li,i) => { li.classList.toggle('current', i === idx); li.classList.toggle('done', i < idx); });
+    if (name !== 'a'){ stopNoise(); try { speechSynthesis.cancel(); } catch(e){} }
+    setup[name] && setup[name]();
+    try { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); } catch(e){ window.scrollTo(0,0); }
+  }
+  $$('[data-next]').forEach(b => b.addEventListener('click', () => go(b.dataset.next)));
+  $('#startBtn').addEventListener('click', () => { audio(); state.t0 = performance.now(); state.tEnd = 0; state.times = {}; go('a'); });
+  $('#restartBtn').addEventListener('click', () => { clearPassport(); state.t0 = 0; state.tEnd = 0; state.times = {}; go('brief'); });
+
+  /* ---------- vault bolts ---------- */
+  (function bolts(){
+    const ns = 'http://www.w3.org/2000/svg';
+    const draw = (g, r, rad, n) => { for (let i = 0; i < n; i++){ const a = i/n*Math.PI*2; const c = document.createElementNS(ns,'circle'); c.setAttribute('cx', 120 + Math.cos(a)*r); c.setAttribute('cy', 120 + Math.sin(a)*r); c.setAttribute('r', rad); c.setAttribute('class','v-bolt'); g.appendChild(c); } };
+    draw($('#bolts'), 73, 4, 12);
+    draw($('.bolts-d'), 101, 5, 14);
+  })();
+
+  /* =========================================================
+     ZONA A · El mensaje
+     ========================================================= */
+  const EN = 'Listen carefully. The first key to the vault is the number twenty-four.';
+  const ES_PRE = 'Escucha con atención. La primera clave de la bóveda es el número ';
+  let anc = false, speaking = false, waveRAF = null;
+  setup.a = () => {
+    anc = false; speaking = false;
+    $('#buds').classList.remove('on'); $('#ancState').textContent = 'ANC apagado';
+    $('#ancBtn').disabled = false; $('#ancBtn').textContent = '1. Ponerse audífonos y activar ANC'; $('#ancBtn').classList.add('pulse');
+    $('#playBtn').disabled = true; $('#playBtn').classList.remove('pulse');
+    $('#transBtn').disabled = true; $('#transBtn').classList.remove('pulse');
+    $('#enText').textContent = ''; $('#esText').textContent = '';
+    $('#noiseLabel').textContent = 'Ruido ambiente: ALTO'; $('#noiseLabel').classList.remove('ok');
+    $('#liveA').textContent = '● ruido'; $('#liveA').classList.remove('ok');
+    $('#hintA').textContent = state.sound ? 'Tip: sube el volumen para sentir el ruido de la sala.' : 'Activa el sonido arriba para escuchar el ruido y el audio.';
+    document.querySelector('[data-next="b"]').hidden = true;
+    tasks('a', 0);
+    startNoise(.12);
+    if (!waveRAF) waveRAF = requestAnimationFrame(drawWave);
+  };
+  function setAnc(){
+    anc = true;
+    if (noiseGain && actx) noiseGain.gain.setTargetAtTime(.004, actx.currentTime, .25);
+    $('#buds').classList.add('on'); $('#ancState').textContent = 'ANC activo';
+    $('#ancBtn').disabled = true; $('#ancBtn').textContent = 'ANC activado'; $('#ancBtn').classList.remove('pulse');
+    $('#noiseLabel').textContent = 'Ruido ambiente: bloqueado por ANC'; $('#noiseLabel').classList.add('ok');
+    $('#liveA').textContent = '● listo'; $('#liveA').classList.add('ok');
+    $('#playBtn').disabled = false; $('#playBtn').classList.add('pulse');
+    tasks('a', 1);
+  }
+  $('#ancBtn').addEventListener('click', () => { setAnc(); beep(880, .08); });
+  $('#playBtn').addEventListener('click', async () => {
+    const my = epoch;
+    $('#playBtn').disabled = true; $('#playBtn').classList.remove('pulse');
+    speaking = true;
+    await Promise.all([ typeText($('#enText'), EN, 45), speak(EN) ]);
+    speaking = false;
+    if (my !== epoch) return;
+    $('#transBtn').disabled = false; $('#transBtn').classList.add('pulse');
+    tasks('a', 2);
+  });
+  function numberButton(){
+    const b = document.createElement('button');
+    b.className = 'reveal'; b.type = 'button'; b.textContent = '24';
+    b.addEventListener('click', () => {
+      if (b.classList.contains('used')) return;
+      b.classList.add('used'); stamp(0, '24'); tasks('a', 4);
+      $('#hintA').textContent = 'Número anotado en la casilla 1 del pasaporte.';
+      showNext('a');
+    });
+    return b;
+  }
+  $('#transBtn').addEventListener('click', async () => {
+    const my = epoch;
+    $('#transBtn').disabled = true; $('#transBtn').classList.remove('pulse');
+    const p = $('#esText'); const span = document.createElement('span'); p.textContent = ''; p.appendChild(span);
+    await typeText(span, ES_PRE, 22);
+    if (my !== epoch) return;
+    p.appendChild(numberButton()); p.appendChild(document.createTextNode('.'));
+    $('#hintA').textContent = 'Encontraste un número. Tócalo para anotarlo en el pasaporte.';
+    tasks('a', 3);
+  });
+  function skipA(){
+    epoch++; speaking = false; try { speechSynthesis.cancel(); } catch(e){}
+    if (!anc) setAnc();
+    $('#playBtn').disabled = true; $('#playBtn').classList.remove('pulse');
+    $('#transBtn').disabled = true; $('#transBtn').classList.remove('pulse');
+    $('#enText').textContent = EN;
+    const p = $('#esText'); p.textContent = ES_PRE; const b = numberButton(); p.appendChild(b); p.appendChild(document.createTextNode('.'));
+    b.click();
+  }
+  function drawWave(){
+    if (state.screen !== 'a'){ waveRAF = null; return; }
+    const c = $('#waveA'), g = c.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    const w = c.clientWidth, h = c.clientHeight;
+    if (w && (c.width !== Math.round(w*dpr) || c.height !== Math.round(h*dpr))){ c.width = Math.round(w*dpr); c.height = Math.round(h*dpr); }
+    g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+    const t = performance.now()/1000, n = 36, bw = w/n;
+    const col = speaking ? css('--signal') : (anc ? css('--muted') : css('--alert'));
+    g.fillStyle = col;
+    for (let i = 0; i < n; i++){
+      const voice = speaking ? Math.abs(Math.sin(t*8 + i*.45) * Math.sin(t*2.1 + i*.17)) * .85 : 0;
+      const nz = Math.random() * (anc ? .06 : .85);
+      const amp = Math.max(.05, Math.min(1, voice + nz));
+      const bh = amp * h * .86;
+      g.fillRect(i*bw + 1.5, (h-bh)/2, Math.max(1, bw-3), bh);
+    }
+    waveRAF = requestAnimationFrame(drawWave);
+  }
+
+  /* =========================================================
+     ZONA B · El trazo
+     ========================================================= */
+  const QR_SEAT = 2;
+  function qrCanvas(){
+    const n = 21, s = 4, cv = document.createElement('canvas'); cv.width = cv.height = n*s;
+    const g = cv.getContext('2d'); g.fillStyle = '#ffffff'; g.fillRect(0,0,n*s,n*s); g.fillStyle = '#0c1416';
+    let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+    const finder = (x,y) => { g.fillRect(x*s,y*s,7*s,7*s); g.fillStyle='#fff'; g.fillRect((x+1)*s,(y+1)*s,5*s,5*s); g.fillStyle='#0c1416'; g.fillRect((x+2)*s,(y+2)*s,3*s,3*s); };
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++){
+      const inF = (x<8&&y<8)||(x>12&&y<8)||(x<8&&y>12); if (!inF && rnd() > .52) g.fillRect(x*s,y*s,s,s);
+    }
+    finder(0,0); finder(14,0); finder(0,14);
+    return cv;
+  }
+  let qrFound = false;
+  setup.b = () => {
+    qrFound = false; mz.progress = 0; mz.done = false; mz.tracing = false; mz.ready = false;
+    const seats = $('#seats'); seats.innerHTML = '';
+    for (let i = 0; i < 4; i++){
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'seat';
+      b.innerHTML = '<span class="seat-box"><span class="backrest"></span><span class="under"></span><span class="legs"></span><span class="cushion"></span></span><span>Asiento ' + (i+1) + '</span>';
+      const under = b.querySelector('.under');
+      if (i === QR_SEAT) under.appendChild(qrCanvas()); else under.textContent = 'Nada';
+      b.addEventListener('click', () => liftSeat(b, i));
+      seats.appendChild(b);
+    }
+    seats.hidden = false;
+    $('#missionB').textContent = 'Hay un código QR escondido debajo de uno de los asientos. Levántalos hasta encontrarlo.';
+    $('#scanBtn').hidden = true; $('#tabletWrap').hidden = true; $('#scanning').hidden = false;
+    $('#wordSlot').innerHTML = '';
+    $('#mazeMsg').textContent = 'Pon el dedo o el mouse en el punto verde y sigue el camino sin salirte.'; $('#mazeMsg').classList.remove('err');
+    document.querySelector('[data-next="c"]').hidden = true;
+    tasks('b', 0);
+  };
+  function liftSeat(b, i){
+    if (qrFound) return;
+    b.classList.add('lifted'); beep(i === QR_SEAT ? 990 : 330, .1);
+    if (i === QR_SEAT){
+      qrFound = true; b.classList.add('found'); tasks('b', 1);
+      $('#missionB').textContent = '¡Ahí está el QR! Escanéalo con la tablet para abrir el plano.';
+      $('#scanBtn').hidden = false; $('#scanBtn').focus({preventScroll:true});
+    }
+  }
+  $('#scanBtn').addEventListener('click', async () => {
+    const my = epoch;
+    $('#scanBtn').hidden = true; $('#seats').hidden = true; $('#tabletWrap').hidden = false;
+    $('#missionB').textContent = 'Traza el camino del laberinto con el stylus, sin salirte de las líneas.';
+    sizeMaze(); drawMaze();
+    await wait(reduce ? 200 : 1300);
+    if (my !== epoch) return;
+    $('#scanning').hidden = true; mz.ready = true; tasks('b', 2); drawMaze();
+  });
+
+  const PATH = [[.08,.86],[.08,.16],[.36,.16],[.36,.62],[.64,.62],[.64,.16],[.92,.16],[.92,.86]];
+  const LETTERS = [['G',.1],['E',.3],['N',.5],['I',.7],['O',.9]];
+  const mz = { w:0, h:0, pts:[], lens:[], total:0, tol:16, progress:0, tracing:false, done:false, ready:false, pen:null };
+  function sizeMaze(){
+    const c = $('#maze'), dpr = window.devicePixelRatio || 1;
+    mz.w = c.clientWidth; mz.h = c.clientHeight; if (!mz.w) return;
+    c.width = Math.round(mz.w*dpr); c.height = Math.round(mz.h*dpr);
+    c.getContext('2d').setTransform(dpr,0,0,dpr,0,0);
+    mz.pts = PATH.map(([x,y]) => [x*mz.w, y*mz.h]);
+    mz.lens = []; mz.total = 0;
+    for (let i = 0; i < mz.pts.length-1; i++){ const L = Math.hypot(mz.pts[i+1][0]-mz.pts[i][0], mz.pts[i+1][1]-mz.pts[i][1]); mz.lens.push(L); mz.total += L; }
+    mz.tol = Math.max(14, Math.min(mz.w, mz.h) * .065);
+  }
+  function pointAt(t){
+    let d = t*mz.total;
+    for (let i = 0; i < mz.lens.length; i++){
+      if (d <= mz.lens[i] || i === mz.lens.length-1){ const u = Math.min(1, d/mz.lens[i]); const a = mz.pts[i], b = mz.pts[i+1]; return [a[0]+(b[0]-a[0])*u, a[1]+(b[1]-a[1])*u]; }
+      d -= mz.lens[i];
+    }
+    return mz.pts[mz.pts.length-1];
+  }
+  function project(px, py){
+    let best = { d:1e9, t:0 }, acc = 0;
+    for (let i = 0; i < mz.lens.length; i++){
+      const a = mz.pts[i], b = mz.pts[i+1], dx = b[0]-a[0], dy = b[1]-a[1], L = mz.lens[i];
+      const u = Math.max(0, Math.min(1, ((px-a[0])*dx + (py-a[1])*dy) / (L*L)));
+      const d = Math.hypot(px-(a[0]+u*dx), py-(a[1]+u*dy));
+      if (d < best.d) best = { d, t:(acc+u*L)/mz.total };
+      acc += L;
+    }
+    return best;
+  }
+  function strokePath(g, upto){
+    g.beginPath(); g.moveTo(mz.pts[0][0], mz.pts[0][1]);
+    let d = upto*mz.total;
+    for (let i = 0; i < mz.lens.length; i++){
+      if (d >= mz.lens[i]){ g.lineTo(mz.pts[i+1][0], mz.pts[i+1][1]); d -= mz.lens[i]; }
+      else { const u = d/mz.lens[i], a = mz.pts[i], b = mz.pts[i+1]; g.lineTo(a[0]+(b[0]-a[0])*u, a[1]+(b[1]-a[1])*u); break; }
+    }
+    g.stroke();
+  }
+  function drawMaze(){
+    const c = $('#maze'), g = c.getContext('2d'); if (!mz.w) return;
+    g.clearRect(0,0,mz.w,mz.h);
+    // dotted paper
+    g.fillStyle = css('--line');
+    for (let x = 12; x < mz.w; x += 22) for (let y = 12; y < mz.h; y += 22) g.fillRect(x, y, 1.5, 1.5);
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    // corridor walls
+    g.strokeStyle = css('--muted'); g.lineWidth = mz.tol*2 + 4; strokePath(g, 1);
+    g.strokeStyle = css('--panel-2'); g.lineWidth = mz.tol*2; strokePath(g, 1);
+    // guide
+    g.setLineDash([4,8]); g.strokeStyle = css('--line'); g.lineWidth = 2; strokePath(g, 1); g.setLineDash([]);
+    // ink
+    if (mz.progress > 0){ g.strokeStyle = css('--brass'); g.lineWidth = 5; strokePath(g, mz.progress); }
+    // start / end
+    const s = mz.pts[0], e = mz.pts[mz.pts.length-1];
+    g.fillStyle = css('--signal'); g.beginPath(); g.arc(s[0], s[1], mz.tol*.6, 0, Math.PI*2); g.fill();
+    g.strokeStyle = css('--brass'); g.lineWidth = 3; g.beginPath(); g.arc(e[0], e[1], mz.tol*.6, 0, Math.PI*2); g.stroke();
+    // letters
+    const fs = Math.max(16, mz.tol*1.25);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    LETTERS.forEach(([ch, t]) => {
+      const [x, y] = pointAt(t), on = mz.progress >= t;
+      g.fillStyle = on ? css('--brass') : css('--panel');
+      g.beginPath(); g.arc(x, y, fs*.72, 0, Math.PI*2); g.fill();
+      g.lineWidth = 2; g.strokeStyle = on ? css('--brass') : css('--line'); g.stroke();
+      g.fillStyle = on ? css('--brass-ink') : css('--muted');
+      g.font = '800 ' + fs + 'px "Bricolage Grotesque", "Trebuchet MS", sans-serif';
+      g.fillText(on ? ch : '?', x, y + 1);
+    });
+    // pen tip
+    if (mz.progress > 0 && !mz.done){ const [x,y] = pointAt(mz.progress); g.fillStyle = css('--fg'); g.beginPath(); g.arc(x, y, 5, 0, Math.PI*2); g.fill(); }
+  }
+  function mazePos(e){ const r = $('#maze').getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  function mazeFail(){
+    mz.tracing = false; mz.progress = 0;
+    const m = $('#mazeMsg'); m.textContent = 'Te saliste del trazo. Vuelve al punto verde y otra vez.'; m.classList.add('err');
+    shake($('.tablet')); beep(180, .2); drawMaze();
+  }
+  function mazeComplete(){
+    mz.done = true; mz.tracing = false; mz.progress = 1; drawMaze(); tasks('b', 3);
+    const m = $('#mazeMsg'); m.classList.remove('err'); m.textContent = 'El trazo formó la palabra mágica. Tócala para anotarla.';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'reveal'; b.style.fontSize = '20px'; b.style.padding = '4px 12px'; b.textContent = 'GENIO';
+    b.addEventListener('click', () => { if (b.classList.contains('used')) return; b.classList.add('used'); stamp(1, 'GENIO'); tasks('b', 4); m.textContent = 'Palabra anotada en la casilla 2 del pasaporte.'; showNext('b'); });
+    const slot = $('#wordSlot'); slot.innerHTML = ''; slot.appendChild(b);
+    beep(660,.1); beep(990,.18,.1);
+    return b;
+  }
+  const mazeEl = $('#maze');
+  mazeEl.addEventListener('pointerdown', e => {
+    if (!mz.ready || mz.done) return;
+    const [x, y] = mazePos(e), p = project(x, y);
+    const atStart = p.t < .04 && p.d < mz.tol;
+    const atPen = mz.progress > 0 && Math.abs(p.t - mz.progress) < .05 && p.d < mz.tol;
+    if (!atStart && !atPen){ const m = $('#mazeMsg'); m.classList.add('err'); m.textContent = mz.progress > 0 ? 'Retoma desde la punta del trazo.' : 'Empieza desde el punto verde.'; return; }
+    e.preventDefault(); mz.tracing = true; try { mazeEl.setPointerCapture(e.pointerId); } catch(err){}
+    const m = $('#mazeMsg'); m.classList.remove('err'); m.textContent = 'Sigue el camino… cada letra se revela al pasar por ella.';
+  });
+  mazeEl.addEventListener('pointermove', e => {
+    if (!mz.tracing) return;
+    const [x, y] = mazePos(e), p = project(x, y);
+    if (p.d > mz.tol){ mazeFail(); return; }
+    if (p.t > mz.progress && p.t <= mz.progress + .06){
+      const before = LETTERS.filter(l => mz.progress >= l[1]).length;
+      mz.progress = p.t;
+      const after = LETTERS.filter(l => mz.progress >= l[1]).length;
+      if (after > before) beep(520 + after*90, .08);
+    }
+    if (mz.progress > .985){ mazeComplete(); return; }
+    drawMaze();
+  });
+  const endTrace = () => { mz.tracing = false; };
+  mazeEl.addEventListener('pointerup', endTrace); mazeEl.addEventListener('pointercancel', endTrace);
+  new ResizeObserver(() => { if (!$('#tabletWrap').hidden){ const t = mz.progress; sizeMaze(); mz.progress = t; drawMaze(); } }).observe(mazeEl);
+
+  async function skipB(){
+    const my = epoch;
+    if (!qrFound) liftSeat($$('#seats .seat')[QR_SEAT], QR_SEAT);
+    if ($('#tabletWrap').hidden){ $('#scanBtn').hidden = true; $('#seats').hidden = true; $('#tabletWrap').hidden = false; sizeMaze(); }
+    $('#scanning').hidden = true; mz.ready = true; tasks('b', 2);
+    $('#missionB').textContent = 'Modo guía: así se ve el trazo completo con el stylus.';
+    const from = mz.progress, t0 = performance.now(), dur = reduce ? 1 : 1400;
+    while (true){
+      if (my !== epoch) return;
+      const k = Math.min(1, (performance.now()-t0)/dur);
+      mz.progress = from + (1-from)*k; drawMaze();
+      if (k >= 1) break;
+      await new Promise(r => requestAnimationFrame(r));
+    }
+    mazeComplete().click();
+  }
+
+  /* =========================================================
+     ZONA C · El enlace
+     ========================================================= */
+  let canHop = false, hopped = false, drag = null;
+  setup.c = () => {
+    canHop = false; hopped = false; drag = null;
+    $('#noteInput').value = ''; $('#noteInput').disabled = false; $('#saveNote').disabled = false;
+    $('#fileChip').hidden = true; $('#hintC').textContent = ''; $('#hintC').classList.remove('err');
+    $('#lapLock').hidden = false; $('#lapRecv').hidden = true; $('#lapOpen').hidden = true; $('#recvBar').style.width = '0';
+    $('#digitC').classList.remove('used');
+    $('#phoneC').classList.remove('draggable','dragging'); $('#phoneC').style.transform = '';
+    $('#tapBtn').hidden = true; $('#hopZone').classList.remove('hot','ping');
+    document.querySelector('[data-next="d"]').hidden = true;
+    tasks('c', 0);
+  };
+  $('#fillNote').addEventListener('click', () => { $('#noteInput').value = state.passport[1] || 'GENIO'; $('#noteInput').focus(); });
+  function saveNote(){
+    const v = $('#noteInput').value.trim().toUpperCase();
+    if (v !== 'GENIO'){
+      $('#hintC').textContent = v ? 'Esa no es. Revisa la casilla 2 del pasaporte.' : 'Escribe la palabra de la casilla 2.';
+      $('#hintC').classList.add('err'); shake($('#noteInput')); beep(180,.2); return;
+    }
+    $('#noteInput').value = 'GENIO'; $('#noteInput').disabled = true; $('#saveNote').disabled = true;
+    $('#fileChip').hidden = false; $('#hintC').classList.remove('err');
+    $('#hintC').textContent = 'Ahora arrastra el teléfono hasta la zona OneHop de la laptop.';
+    $('#phoneC').classList.add('draggable'); $('#tapBtn').hidden = false; canHop = true;
+    tasks('c', 1); beep(700,.1);
+  }
+  $('#saveNote').addEventListener('click', saveNote);
+  $('#noteInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveNote(); });
+
+  const phone = $('#phoneC'), hop = $('#hopZone');
+  function overHop(){
+    const a = phone.getBoundingClientRect(), b = hop.getBoundingClientRect(), pad = 30;
+    return a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
+  }
+  phone.addEventListener('pointerdown', e => {
+    if (!canHop || hopped || e.target.closest('input,button')) return;
+    e.preventDefault();
+    drag = { x:e.clientX, y:e.clientY }; phone.classList.add('dragging');
+    try { phone.setPointerCapture(e.pointerId); } catch(err){}
+  });
+  phone.addEventListener('pointermove', e => {
+    if (!drag) return;
+    phone.style.transform = 'translate(' + (e.clientX-drag.x) + 'px,' + (e.clientY-drag.y) + 'px) rotate(-6deg) scale(.92)';
+    hop.classList.toggle('hot', overHop());
+  });
+  const dropPhone = () => {
+    if (!drag) return;
+    drag = null; phone.classList.remove('dragging');
+    if (overHop()) transfer();
+    else { phone.style.transform = ''; hop.classList.remove('hot'); }
+  };
+  phone.addEventListener('pointerup', dropPhone); phone.addEventListener('pointercancel', dropPhone);
+  $('#tapBtn').addEventListener('click', () => { if (canHop && !hopped) transfer(); });
+
+  async function transfer(){
+    const my = epoch;
+    hopped = true; canHop = false; $('#tapBtn').hidden = true;
+    hop.classList.remove('hot'); hop.classList.add('ping'); beep(880,.08); beep(1320,.12,.08);
+    phone.classList.remove('draggable');
+    $('#hintC').textContent = 'Choque OneHop detectado. Enviando archivo…';
+    tasks('c', 2);
+    $('#lapLock').hidden = true; $('#lapRecv').hidden = false;
+    requestAnimationFrame(() => { $('#recvBar').style.width = '100%'; });
+    await wait(450); phone.style.transform = '';
+    await wait(reduce ? 100 : 1000);
+    if (my !== epoch) return;
+    $('#lapRecv').hidden = true; $('#lapOpen').hidden = false; hop.classList.remove('ping');
+    $('#hintC').textContent = 'La laptop se desbloqueó.';
+    beep(523,.12); beep(659,.12,.1); beep(784,.2,.2);
+  }
+  $('#digitC').addEventListener('click', () => {
+    const b = $('#digitC'); if (b.classList.contains('used')) return;
+    b.classList.add('used'); stamp(2, '7'); tasks('c', 4);
+    $('#hintC').textContent = 'Dígito anotado en la casilla 3. ¡Pasaporte completo!';
+    showNext('c');
+  });
+  async function skipC(){
+    const my = epoch;
+    if (!hopped){
+      if (!canHop){ $('#noteInput').value = 'GENIO'; saveNote(); }
+      await transfer();
+    }
+    if (my !== epoch) return;
+    $('#digitC').click();
+  }
+
+  /* =========================================================
+     ZONA D · La bóveda
+     ========================================================= */
+  setup.d = () => {
+    $('#vault').classList.remove('unlocking','open');
+    ['c0','c1','c2'].forEach(id => { $('#'+id).textContent = '—'; $('#'+id).classList.remove('in'); });
+    $('#comboBtn').hidden = false; $('#comboBtn').disabled = false;
+    $('#victory').hidden = true; $('#confetti').innerHTML = '';
+    document.querySelector('[data-next="end"]').hidden = true;
+    tasks('d', 0);
+  };
+  $('#comboBtn').addEventListener('click', async () => {
+    const my = epoch;
+    $('#comboBtn').disabled = true;
+    const vals = [state.passport[0] || '24', state.passport[1] || 'GENIO', state.passport[2] || '7'];
+    for (let i = 0; i < 3; i++){
+      await wait(reduce ? 50 : 420); if (my !== epoch) return;
+      const s = $('#c'+i); s.textContent = vals[i]; s.classList.add('in'); beep(440 + i*160, .12);
+    }
+    tasks('d', 1);
+    await wait(250); $('#vault').classList.add('unlocking'); beep(220,.25);
+    await wait(reduce ? 50 : 900); if (my !== epoch) return;
+    $('#vault').classList.add('open'); state.tEnd = performance.now();
+    beep(523,.15); beep(659,.15,.12); beep(784,.15,.24); beep(1047,.35,.36);
+    confetti();
+    await wait(reduce ? 50 : 1100); if (my !== epoch) return;
+    $('#comboBtn').hidden = true;
+    $('#photoCaption').textContent = vals.join(' · ') + ' · ' + fmt(state.tEnd - state.t0);
+    $('#victory').hidden = false; tasks('d', 4);
+    showNext('d');
+  });
+  function confetti(){
+    if (reduce) return;
+    const box = $('#confetti'), cols = ['--brass','--signal','--alert','--fg'].map(css);
+    for (let i = 0; i < 46; i++){
+      const p = document.createElement('i');
+      p.style.left = Math.random()*100 + '%'; p.style.background = cols[i % cols.length];
+      p.style.animationDelay = (Math.random()*.5) + 's'; p.style.animationDuration = (1.4 + Math.random()) + 's';
+      box.appendChild(p);
+    }
+    setTimeout(() => { box.innerHTML = ''; }, 3200);
+  }
+
+  /* =========================================================
+     Resumen
+     ========================================================= */
+  setup.end = () => {
+    const rows = [
+      ['Briefing', 'Pasaporte físico', '—', '2:00', null],
+      ['A · El mensaje', 'HONOR 600 Pro + Earbuds 3 Pro', '24', '4:00', 'a'],
+      ['B · El trazo', 'HONOR Pad 10 + Stylus', 'GENIO', '4:00', 'b'],
+      ['C · El enlace', 'MagicBook Pro 14 + 600 Pro', '7', '4:00', 'c'],
+      ['D · La bóveda', 'Cofre con candado', '24-GENIO-7', '1:00', 'd'],
+    ];
+    const body = $('#sumBody'); body.innerHTML = '';
+    let total = 0;
+    rows.forEach(([name, dev, key, plan, z]) => {
+      const t = z ? (state.times[z] || 0) : 0; total += t;
+      const tr = document.createElement('tr');
+      [name, dev, key].forEach(v => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
+      const tp = document.createElement('td'); tp.className = 'num'; tp.textContent = plan; tr.appendChild(tp);
+      const ty = document.createElement('td'); ty.className = 'num'; ty.textContent = z ? fmt(t) : '—'; tr.appendChild(ty);
+      body.appendChild(tr);
+    });
+    $('#sumTotal').textContent = fmt(total);
+    $('#sumCombo').textContent = state.passport.map(v => v || '?').join('-');
+  };
+
+  /* ---------- skip buttons ---------- */
+  const skips = { a: skipA, b: skipB, c: skipC };
+  $$('[data-skip]').forEach(b => b.addEventListener('click', () => skips[b.dataset.skip]()));
+
+  /* ---------- boot (keeps progress across live updates) ---------- */
+  window.claude?.hot?.snapshot?.(() => ({ screen: state.screen, passport: state.passport }));
+  function start(data){
+    data = data || {};
+    if (Array.isArray(data.passport)) data.passport.forEach((v,i) => { if (v){ state.passport[i] = v; const s = $('#slot'+i); s.querySelector('b').textContent = v; s.classList.add('stamped'); } });
+    const scr = ORDER.includes(data.screen) ? data.screen : 'brief';
+    if (scr !== 'brief') state.t0 = performance.now();
+    go(scr);
+  }
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
