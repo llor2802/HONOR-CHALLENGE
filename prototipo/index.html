@@ -335,7 +335,7 @@ h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;mar
     <!-- ZONA A -->
     <section class="screen" data-screen="a" hidden>
       <div class="zone-head"><span class="zone-tag">Zona A</span><h2>El mensaje</h2><span class="zone-meta">Celular + audífonos · 4 min en sala</span></div>
-      <p class="mission">Hay mucho ruido en la sala. Aísla el audio, escúchalo en inglés y deja que la IA lo traduzca para encontrar el número escondido.</p>
+      <p class="mission">Hay mucho ruido en la sala. Aísla el audio, escúchalo en francés y deja que la IA lo traduzca para encontrar el número escondido.</p>
       <div class="zone-grid">
         <div class="sim">
           <div class="devices">
@@ -344,7 +344,7 @@ h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;mar
                 <div class="app-bar"><span>Traducción IA</span><span class="live" id="liveA">● ruido</span></div>
                 <canvas id="waveA" aria-hidden="true"></canvas>
                 <p class="noise-label" id="noiseLabel">Ruido ambiente: ALTO</p>
-                <div class="tr"><small>EN · AUDIO</small><p id="enText" class="en"></p></div>
+                <div class="tr"><small>FR · AUDIO</small><p id="enText" class="en"></p></div>
                 <div class="tr"><small>ES · TRADUCCIÓN</small><p id="esText" class="es"></p></div>
               </div>
             </div>
@@ -366,11 +366,11 @@ h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;mar
         </div>
         <aside class="real">
           <h3>En la sala real</h3>
-          <p>Suena ruido ambiente distractor. El equipo se pone los audífonos con Cancelación de Ruido Activa (ANC) para escuchar un audio rápido en inglés y usa la traducción con IA en vivo del teléfono para transcribirlo al español.</p>
+          <p>Suena ruido ambiente distractor. El equipo se pone los audífonos con Cancelación de Ruido Activa (ANC) para escuchar un audio rápido en francés y usa la traducción con IA en vivo del teléfono para transcribirlo al español.</p>
           <div><span class="device-tag">HONOR 600 Pro</span><span class="device-tag">Earbuds 3 Pro</span></div>
           <ol class="tasks" data-zone="a">
             <li>Activar ANC</li>
-            <li>Escuchar el audio en inglés</li>
+            <li>Escuchar el audio en francés</li>
             <li>Traducir con IA en vivo</li>
             <li>Anotar el número en la casilla 1</li>
           </ol>
@@ -603,7 +603,8 @@ h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;mar
     return new Promise(res => {
       if (!state.sound || !('speechSynthesis' in window)) return res();
       try {
-        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = .95;
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'fr-FR'; u.rate = .95;
+        try { const v = speechSynthesis.getVoices().find(x => /^fr/i.test(x.lang)); if (v) u.voice = v; } catch(e){}
         u.onend = res; u.onerror = res; speechSynthesis.cancel(); speechSynthesis.speak(u);
         setTimeout(res, 8000);
       } catch(e){ res(); }
@@ -671,7 +672,7 @@ h2{font-family:var(--display);font-size:clamp(24px,4vw,32px);font-weight:700;mar
   /* =========================================================
      ZONA A · El mensaje
      ========================================================= */
-  const EN = 'Listen carefully. The first key to the vault is the number twenty-four.';
+  const EN = 'Écoutez bien. La première clé du coffre-fort est le nombre vingt-quatre.';
   const ES_PRE = 'Escucha con atención. La primera clave de la bóveda es el número ';
   let anc = false, speaking = false, waveRAF = null;
   setup.a = () => {
