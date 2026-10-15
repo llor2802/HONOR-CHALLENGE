@@ -76,28 +76,57 @@ button.chip[aria-pressed="false"]{color:var(--muted)}
 .map-inner{position:relative;width:min(100cqw,75cqh);aspect-ratio:3/4;transition:transform .7s cubic-bezier(.6,0,.2,1),opacity .7s ease}
 .map-inner.zoom{transform:scale(2.8);opacity:0}
 .map svg{width:100%;height:100%;display:block}
-.floor{fill:var(--floor)}
-.tile{fill:none;stroke:var(--panel);stroke-width:1}
-.wall{fill:none;stroke:var(--line);stroke-width:6}
-.seat-m{fill:var(--panel-2);stroke:var(--line);stroke-width:1.5}
-.pool{opacity:.25;transition:opacity .6s}
-.pool.on{opacity:.9}
-.pool.done{opacity:.35}
-.seg{fill:none;stroke:var(--line);stroke-width:3;stroke-dasharray:2 8;stroke-linecap:round}
-.seg.lit{stroke:var(--brass);stroke-dasharray:10 8;animation:flow 1.2s linear infinite}
-@keyframes flow{to{stroke-dashoffset:-18}}
-.map-note{fill:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:.1em}
+.map-inner{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.outside{fill:var(--device)}
+.plank{fill:#1d2b2c}
+.plank-line{fill:none;stroke:#162224;stroke-width:1}
+.rug{fill:#243a3f}
+.rug-ring{fill:none;stroke:var(--brass);stroke-width:1.5;opacity:.35;stroke-dasharray:3 4}
+.lampbase{fill:var(--panel-2);stroke:var(--line);stroke-width:2}
+.bulb{fill:var(--brass)}
+.sofa{fill:#2b464d}
+.r-cushion{fill:#35575f}
+.pot{fill:#5a3d2b}
+.leaf ellipse{fill:#3f7a5f}
+.wood{fill:#4a3826}
+.cup{fill:var(--paper);stroke:#4a3826;stroke-width:1.5}
+.book{fill:var(--alert);opacity:.8}
+.device{fill:#0b1012;stroke:#3d555b;stroke-width:1}
+.case{fill:var(--fg)}
+.chair-seat{fill:#35575f;stroke:#21363b;stroke-width:1.5}
+.chair-back{fill:#2b464d}
+.shelf{fill:#3b2c1d}
+.r-laptop{fill:#8a979a}
+.keys{fill:#5f6d70}
+.safe{fill:#34454b;stroke:var(--brass);stroke-width:2}
+.dial{fill:var(--panel-2);stroke:var(--brass);stroke-width:2.5}
+.dial-line{stroke:var(--brass);stroke-width:2;opacity:.7}
+.bolt{fill:var(--brass)}
+.wall{fill:none;stroke:#3a565d;stroke-width:10;stroke-linejoin:round}
+.poster{fill:var(--brass)}
+.door{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:3 3}
 
-.st{position:absolute;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;width:96px;cursor:pointer}
-.st .orb{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--panel-2);border:2px solid var(--line);color:var(--muted);transition:all .3s}
-.st .orb svg{width:26px;height:26px}
-.st .lbl{font-size:11px;font-weight:600;line-height:1.2;text-align:center;background:rgba(10,17,19,.85);border-radius:6px;padding:2px 6px;color:var(--muted)}
-.st.locked{cursor:default;opacity:.55}
-.st.active .orb{border-color:var(--brass);color:var(--brass);background:var(--brass-soft);animation:beacon 1.6s ease-out infinite}
-.st.active .lbl{color:var(--brass)}
-@keyframes beacon{0%{box-shadow:0 0 0 0 rgba(234,180,87,.55),0 0 24px rgba(234,180,87,.35)}100%{box-shadow:0 0 0 22px rgba(234,180,87,0),0 0 24px rgba(234,180,87,.35)}}
-.st.done .orb{border-color:var(--signal);color:var(--signal)}
-.st.done .lbl{color:var(--fg)}
+.spot{position:absolute;background:none;border:2px dashed transparent;border-radius:12px;padding:0;cursor:pointer;transition:border-color .3s,background .3s}
+.spot:hover,.spot.near{border-color:rgba(234,180,87,.55);background:rgba(234,180,87,.06)}
+.spot.done{border-color:transparent;background:none}
+.glint{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none;
+  background:radial-gradient(circle,#fff 0 12%,rgba(234,180,87,.9) 28%,transparent 68%);animation:glint 2.8s ease-in-out infinite}
+@keyframes glint{0%,62%,100%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(0)}76%{opacity:1;transform:translate(-50%,-50%) scale(1.5) rotate(45deg)}}
+.spot.done .glint{display:none}
+.tag{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-4px);white-space:nowrap;background:var(--brass);color:var(--brass-ink);font-size:11px;font-weight:700;border-radius:6px;padding:2px 7px;opacity:0;transition:opacity .25s;pointer-events:none}
+.spot.below .tag{bottom:auto;top:100%;transform:translate(-50%,4px)}
+.spot.near .tag{opacity:1}
+.spot.done .tag{opacity:1;background:var(--signal);color:var(--bg)}
+.player{position:absolute;width:10%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;z-index:3}
+.player svg{position:relative;width:100%;height:100%;display:block;transform:rotate(var(--ang,0deg));filter:drop-shadow(0 3px 3px rgba(0,0,0,.5))}
+.player.walking svg{animation:bob .32s ease-in-out infinite}
+@keyframes bob{50%{transform:rotate(var(--ang,0deg)) scale(1.07)}}
+.aura{position:absolute;left:50%;top:50%;width:420%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(234,180,87,.14),transparent 65%)}
+.pl-body{fill:var(--signal)}
+.pl-hair{fill:#2a1e14}
+.pl-skin{fill:#d5a27c}
+.tap-mark{position:absolute;width:26px;height:26px;transform:translate(-50%,-50%);border:2px solid var(--brass);border-radius:50%;pointer-events:none;animation:tapm .6s ease-out forwards}
+@keyframes tapm{from{opacity:1;transform:translate(-50%,-50%) scale(.3)}to{opacity:0;transform:translate(-50%,-50%) scale(1.3)}}
 
 /* Scenes */
 .scene{position:absolute;inset:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;
@@ -326,26 +355,64 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
 
   <div class="stage" id="stage">
 
-    <!-- MAP -->
+    <!-- ROOM (top-down) -->
     <div class="map" id="map" hidden>
       <div class="map-inner" id="mapInner">
         <svg viewBox="0 0 300 400" aria-hidden="true">
           <defs>
-            <pattern id="tiles" width="20" height="20" patternUnits="userSpaceOnUse"><path class="tile" d="M20 0H0V20"/></pattern>
-            <radialGradient id="poolG"><stop offset="0" stop-color="#eab457" stop-opacity=".55"/><stop offset="1" stop-color="#eab457" stop-opacity="0"/></radialGradient>
-            <radialGradient id="poolD"><stop offset="0" stop-color="#62d6c1" stop-opacity=".4"/><stop offset="1" stop-color="#62d6c1" stop-opacity="0"/></radialGradient>
+            <pattern id="planks" width="60" height="24" patternUnits="userSpaceOnUse"><rect width="60" height="24" class="plank"/><path class="plank-line" d="M0 23.5H60M0 11.5H60M40 0V12M10 12V24"/></pattern>
+            <radialGradient id="lampGlow"><stop offset="0" stop-color="#eab457" stop-opacity=".32"/><stop offset="1" stop-color="#eab457" stop-opacity="0"/></radialGradient>
+            <radialGradient id="vign" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></radialGradient>
           </defs>
-          <rect class="floor" x="0" y="0" width="300" height="400" rx="18"/>
-          <rect x="0" y="0" width="300" height="400" rx="18" fill="url(#tiles)"/>
-          <rect class="wall" x="5" y="5" width="290" height="390" rx="16"/>
-          <g id="pools"></g>
-          <path class="seg" id="seg0" d="M70 80 H230"/>
-          <path class="seg" id="seg1" d="M230 80 Q230 165 150 165 Q70 165 70 250"/>
-          <path class="seg" id="seg2" d="M70 250 Q70 345 150 345"/>
-          <g id="seatsMap"></g>
-          <text class="map-note" x="150" y="392" text-anchor="middle">ENTRADA</text>
+          <rect x="0" y="0" width="300" height="400" rx="16" class="outside"/>
+          <rect x="10" y="10" width="280" height="380" fill="url(#planks)"/>
+          <!-- rug + light -->
+          <ellipse class="rug" cx="150" cy="200" rx="72" ry="54"/>
+          <ellipse class="rug-ring" cx="150" cy="200" rx="60" ry="43"/>
+          <circle cx="150" cy="200" r="120" fill="url(#lampGlow)"/>
+          <circle cx="32" cy="200" r="46" fill="url(#lampGlow)"/>
+          <circle class="lampbase" cx="32" cy="200" r="9"/><circle class="bulb" cx="32" cy="200" r="4"/>
+          <!-- sofa corner -->
+          <rect class="sofa" x="18" y="14" width="92" height="34" rx="9"/>
+          <rect class="r-cushion" x="23" y="19" width="26" height="24" rx="5"/><rect class="r-cushion" x="51" y="19" width="26" height="24" rx="5"/><rect class="r-cushion" x="79" y="19" width="26" height="24" rx="5"/>
+          <circle class="pot" cx="126" cy="28" r="12"/>
+          <g class="leaf"><ellipse cx="118" cy="22" rx="9" ry="5" transform="rotate(-30 118 22)"/><ellipse cx="133" cy="22" rx="9" ry="5" transform="rotate(30 133 22)"/><ellipse cx="126" cy="36" rx="5" ry="9"/><ellipse cx="126" cy="18" rx="4" ry="8"/></g>
+          <rect class="wood" x="30" y="62" width="72" height="40" rx="5"/>
+          <circle class="cup" cx="43" cy="73" r="5"/>
+          <rect class="book" x="80" y="67" width="16" height="22" rx="2"/>
+          <rect class="device" x="64" y="84" width="10" height="16" rx="2"/>
+          <rect class="case" x="46" y="86" width="12" height="10" rx="4"/>
+          <!-- seats + tablet -->
+          <g id="chairs"></g>
+          <circle class="wood" cx="272" cy="108" r="15"/>
+          <rect class="device" x="262" y="101" width="20" height="14" rx="2"/>
+          <!-- bookshelf -->
+          <rect class="shelf" x="272" y="150" width="18" height="96" rx="2"/>
+          <g id="books"></g>
+          <!-- desk + laptop -->
+          <rect class="wood" x="16" y="262" width="98" height="40" rx="4"/>
+          <rect class="device" x="44" y="265" width="38" height="5" rx="1.5"/>
+          <rect class="r-laptop" x="44" y="271" width="38" height="22" rx="2.5"/>
+          <rect class="keys" x="48" y="274" width="30" height="9" rx="1"/>
+          <circle class="cup" cx="100" cy="276" r="5"/>
+          <circle class="chair-seat" cx="64" cy="318" r="12"/>
+          <!-- vault -->
+          <rect class="safe" x="226" y="280" width="58" height="58" rx="6"/>
+          <circle class="dial" cx="255" cy="309" r="15"/>
+          <path class="dial-line" d="M255 296V322M242 309H268"/>
+          <circle class="bolt" cx="232" cy="286" r="2"/><circle class="bolt" cx="278" cy="286" r="2"/><circle class="bolt" cx="232" cy="332" r="2"/><circle class="bolt" cx="278" cy="332" r="2"/>
+          <!-- walls + door -->
+          <path class="wall" d="M128 395 H5 V5 H295 V395 H172"/>
+          <rect class="poster" x="128" y="8" width="44" height="5" rx="1"/>
+          <path class="door" d="M128 395 V352 A43 43 0 0 1 171 395"/>
+          <rect x="0" y="0" width="300" height="400" rx="16" fill="url(#vign)"/>
         </svg>
-        <div id="stations"></div>
+        <div id="hotspots"></div>
+        <div class="tap-mark" id="tapMark" hidden></div>
+        <div class="player" id="player" aria-hidden="true">
+          <span class="aura"></span>
+          <svg viewBox="0 0 40 40"><ellipse class="pl-body" cx="20" cy="23" rx="15" ry="8"/><circle class="pl-hair" cx="20" cy="21" r="8.5"/><ellipse class="pl-skin" cx="20" cy="15.5" rx="5.5" ry="3.5"/></svg>
+        </div>
       </div>
     </div>
 
@@ -353,7 +420,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
     <section class="scene intro" id="intro">
       <svg class="intro-lamp" viewBox="0 0 120 80" aria-hidden="true"><path class="smoke" d="M58 28 C48 18 68 14 58 2"/><ellipse class="lamp" cx="56" cy="33" rx="12" ry="4"/><path class="lamp" d="M20 52 C20 40 40 34 60 34 C78 34 86 40 92 44 L112 34 C115 33 117 36 114 38 L96 54 C90 62 76 66 60 66 C38 66 20 62 20 52 Z"/><path class="lamp-line" d="M22 50 C6 50 6 34 20 38"/><rect class="lamp" x="44" y="66" width="28" height="6" rx="2"/></svg>
       <h2>El Genio de HONOR quedó atrapado en la Bóveda</h2>
-      <p>Recorre las estaciones de la sala y consigue tres claves: un número, una palabra y un dígito. Tienes 12 minutos.</p>
+      <p>Explora la sala y encuentra los aparatos y pistas escondidos. Necesitas tres claves: un número, una palabra y un dígito. Tienes 12 minutos.</p>
       <button class="btn primary pulse" id="startBtn" type="button">Recibir pasaporte</button>
     </section>
 
@@ -393,7 +460,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
           </div>
         </div>
       </div>
-      <div class="scene-foot"><button class="btn go" type="button" data-back hidden>Volver a la sala →</button></div>
+      <div class="scene-foot"><button class="btn" type="button" data-back>← Volver a la sala</button></div>
     </section>
 
     <!-- ZONE B -->
@@ -410,7 +477,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
         </div></div>
         <div class="b-word" id="bWord"></div>
       </div>
-      <div class="scene-foot"><button class="btn go" type="button" data-back hidden>Volver a la sala →</button></div>
+      <div class="scene-foot"><button class="btn" type="button" data-back>← Volver a la sala</button></div>
     </section>
 
     <!-- ZONE C -->
@@ -439,7 +506,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
         </div>
         <svg class="beam" id="beam" aria-hidden="true"><path id="beamPath" d=""/><circle id="beamDot" r="6" cx="-20" cy="-20"/></svg>
       </div>
-      <div class="scene-foot"><button class="btn go" type="button" data-back hidden>Volver a la sala →</button></div>
+      <div class="scene-foot"><button class="btn" type="button" data-back>← Volver a la sala</button></div>
     </section>
 
     <!-- ZONE D -->
@@ -489,7 +556,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
         </div>
         <div class="confetti" id="confetti"></div>
       </div>
-      <div class="scene-foot"><button class="btn go" type="button" id="toSummary" hidden>Ver resumen →</button></div>
+      <div class="scene-foot" style="justify-content:space-between"><button class="btn" type="button" data-back id="backD">← Volver a la sala</button><button class="btn go" type="button" id="toSummary" hidden>Ver resumen →</button></div>
     </section>
 
     <!-- SUMMARY -->
@@ -498,7 +565,7 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
       <p class="foot" style="font-size:14px;color:var(--fg)">Así se compara tu recorrido con los tiempos planificados para la activación en sala.</p>
       <div class="table-wrap">
         <table class="summary">
-          <thead><tr><th>Estación</th><th>Equipo HONOR</th><th>Clave</th><th>En sala</th><th>Tu tiempo</th></tr></thead>
+          <thead><tr><th>Reto</th><th>Equipo HONOR</th><th>Clave</th><th>En sala</th><th>Tu tiempo</th></tr></thead>
           <tbody id="sumBody"></tbody>
           <tfoot><tr><td>Total</td><td></td><td id="sumCombo">—</td><td class="num">13:00</td><td class="num" id="sumTotal">—</td></tr></tfoot>
         </table>
@@ -525,14 +592,14 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
   const fmt = ms => { const s = Math.max(0, Math.round(ms/1000)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
 
   const ZONES = [
-    { id:'A', x:70,  y:80,  name:'El mensaje', icon:'<path d="M4 15v-3a8 8 0 0 1 16 0v3" fill="none" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="4" height="7" rx="2" fill="currentColor"/><rect x="17" y="14" width="4" height="7" rx="2" fill="currentColor"/>' },
-    { id:'B', x:230, y:80,  name:'El trazo',   icon:'<path d="M4 20l1-4L16 5l3 3L8 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 7l3 3" stroke="currentColor" stroke-width="2"/>' },
-    { id:'C', x:70,  y:250, name:'El enlace',  icon:'<rect x="4" y="5" width="16" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 19h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
-    { id:'D', x:150, y:345, name:'La bóveda',  icon:'<rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/>' }
+    { id:'A', name:'El mensaje', spot:'Mesa del sofá', label:'Audífonos y celular', box:[28,58,78,48],   glint:[52,91],   pt:[66,124],  below:true,  hint:'Algo brilla en la mesita, junto al sofá.' },
+    { id:'B', name:'El trazo',   spot:'Asientos',      label:'Asientos y tablet',   box:[160,20,130,108], glint:[272,108], pt:[222,142], below:true,  hint:'Revisa los asientos de arriba a la derecha. Hay una tablet al lado.' },
+    { id:'C', name:'El enlace',  spot:'Escritorio',    label:'Laptop',              box:[14,258,102,48],  glint:[63,282],  pt:[92,336],  below:false, hint:'Hay una laptop dormida en el escritorio de abajo a la izquierda.' },
+    { id:'D', name:'La bóveda',  spot:'Bóveda',        label:'Bóveda',              box:[222,276,66,66],  glint:[255,309], pt:[204,332], below:false, hint:'La bóveda está en la esquina de abajo a la derecha.' }
   ];
   const ROOM_MIN = ['4:00','4:00','4:00','1:00'];
   const KIT = ['HONOR 600 Pro + Earbuds 3 Pro','HONOR Pad 10 + Stylus','MagicBook Pro 14 + 600 Pro','Cofre con candado'];
-  const S = { done:0, passport:[null,null,null], t0:0, tEnd:0, sound:true, times:{}, zoneStart:0, scene:'intro' };
+  const S = { solved:[false,false,false,false], passport:[null,null,null], t0:0, tEnd:0, sound:true, times:{}, zoneStart:0, scene:'intro' };
   let epoch = 0;
 
   /* ---------- clock (countdown from 12:00) ---------- */
@@ -612,70 +679,140 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
   }
   function clearPassport(){ S.passport = [null,null,null]; $$('.stamp').forEach(s => s.remove()); }
 
-  /* ---------- map ---------- */
-  (function buildMap(){
+  /* ---------- room ---------- */
+  (function buildRoom(){
     const ns = 'http://www.w3.org/2000/svg';
-    const pools = $('#pools');
-    ZONES.forEach((z,i) => { const c = document.createElementNS(ns,'circle'); c.setAttribute('cx', z.x); c.setAttribute('cy', z.y); c.setAttribute('r', 52); c.setAttribute('fill','url(#poolG)'); c.setAttribute('class','pool'); c.id = 'pool'+i; pools.appendChild(c); });
-    const seats = $('#seatsMap');
-    [122, 205].forEach(y => { for (let k = 0; k < 4; k++){ const r = document.createElementNS(ns,'rect'); r.setAttribute('x', 106 + k*24); r.setAttribute('y', y); r.setAttribute('width', 17); r.setAttribute('height', 13); r.setAttribute('rx', 3); r.setAttribute('class','seat-m'); seats.appendChild(r); } });
-    const box = $('#stations');
+    const chairs = $('#chairs');
+    [168,198,228,258].forEach(x => {
+      const b = document.createElementNS(ns,'rect'); b.setAttribute('x', x); b.setAttribute('y', 24); b.setAttribute('width', 22); b.setAttribute('height', 7); b.setAttribute('rx', 3); b.setAttribute('class','chair-back'); chairs.appendChild(b);
+      const c = document.createElementNS(ns,'rect'); c.setAttribute('x', x); c.setAttribute('y', 32); c.setAttribute('width', 22); c.setAttribute('height', 20); c.setAttribute('rx', 5); c.setAttribute('class','chair-seat'); chairs.appendChild(c);
+    });
+    const books = $('#books'), cols = ['#e6b052','#62d6c1','#f0715f','#8fa5a2','#ecf1ea'];
+    for (let k = 0; k < 9; k++){ const r = document.createElementNS(ns,'rect'); r.setAttribute('x', 275); r.setAttribute('y', 154 + k*10); r.setAttribute('width', 12); r.setAttribute('height', 7); r.setAttribute('rx', 1); r.setAttribute('fill', cols[k % cols.length]); r.setAttribute('opacity', .75); books.appendChild(r); }
+    const box = $('#hotspots');
     ZONES.forEach((z,i) => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'st'; b.dataset.i = i;
-      b.style.left = (z.x/300*100) + '%'; b.style.top = (z.y/400*100) + '%';
-      b.innerHTML = '<span class="orb"><svg viewBox="0 0 24 24">' + z.icon + '</svg></span><span class="lbl">' + z.id + ' · ' + z.name + '</span>';
-      b.addEventListener('click', () => { if (i === S.done) enterZone(i); });
+      const [bx,by,bw,bh] = z.box;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'spot' + (z.below ? ' below' : ''); b.id = 'spot'+i;
+      b.style.left = (bx/300*100) + '%'; b.style.top = (by/400*100) + '%'; b.style.width = (bw/300*100) + '%'; b.style.height = (bh/400*100) + '%';
+      b.setAttribute('aria-label', z.spot + ': ' + z.label);
+      b.innerHTML = '<span class="glint" style="left:' + ((z.glint[0]-bx)/bw*100) + '%;top:' + ((z.glint[1]-by)/bh*100) + '%;animation-delay:' + (i*.7) + 's"></span><span class="tag">' + z.label + '</span>';
+      b.addEventListener('click', e => { e.stopPropagation(); useSpot(i); });
       box.appendChild(b);
     });
     const bolts = $('#boltsD');
     for (let i = 0; i < 14; i++){ const a = i/14*Math.PI*2, c = document.createElementNS(ns,'circle'); c.setAttribute('cx', 120 + Math.cos(a)*104); c.setAttribute('cy', 120 + Math.sin(a)*104); c.setAttribute('r', 5); c.setAttribute('class','v-bolt'); bolts.appendChild(c); }
   })();
-  function renderMap(){
-    $$('.st').forEach((b,i) => {
-      b.classList.toggle('done', i < S.done); b.classList.toggle('active', i === S.done); b.classList.toggle('locked', i > S.done);
-      b.setAttribute('aria-disabled', String(i !== S.done));
-      b.setAttribute('aria-label', 'Estación ' + ZONES[i].id + ', ' + ZONES[i].name + (i < S.done ? ', completada' : i === S.done ? ', disponible' : ', bloqueada'));
+  function renderRoom(){
+    ZONES.forEach((z,i) => {
+      const b = $('#spot'+i); b.classList.toggle('done', S.solved[i]);
+      b.querySelector('.tag').textContent = (S.solved[i] ? '✓ ' : '') + z.label;
     });
-    ZONES.forEach((z,i) => { const p = $('#pool'+i); p.classList.toggle('on', i === S.done); p.classList.toggle('done', i < S.done); p.setAttribute('fill', i < S.done ? 'url(#poolD)' : 'url(#poolG)'); });
-    [0,1,2].forEach(i => $('#seg'+i).classList.toggle('lit', S.done > i));
   }
-  const MAP_LINES = [
-    ['Toca la estación A, la que brilla. Ahí empieza todo.', 'La estación que brilla en la esquina de arriba es la A. Tócala.'],
-    ['¡Un número! Ahora sigue el camino hasta la estación B.', 'Toca la estación B, arriba a la derecha.'],
-    ['¡Ya tienes la palabra! La estación C te espera.', 'Toca la estación C, abajo a la izquierda.'],
-    ['Pasaporte completo. Corre a la Bóveda y sácame de aquí.', 'Toca la Bóveda, abajo al centro.']
-  ];
-  function showMap(fromZoom){
+
+  /* ---------- player ---------- */
+  const P = { x:150, y:372, tx:150, ty:372, ang:0, cb:null };
+  const seen = [false,false,false,false];
+  let walkRAF = null, lastT = 0;
+  const playerEl = $('#player');
+  function placePlayer(){ playerEl.style.left = (P.x/300*100) + '%'; playerEl.style.top = (P.y/400*100) + '%'; playerEl.style.setProperty('--ang', P.ang + 'deg'); }
+  placePlayer();
+  function walkTo(x, y, cb){
+    P.tx = Math.max(22, Math.min(278, x)); P.ty = Math.max(22, Math.min(378, y)); P.cb = cb || null;
+    if (!walkRAF){ lastT = performance.now(); walkRAF = requestAnimationFrame(stepWalk); }
+  }
+  function stepWalk(t){
+    const dt = Math.min(.05, (t - lastT)/1000); lastT = t;
+    const dx = P.tx - P.x, dy = P.ty - P.y, d = Math.hypot(dx, dy);
+    if (d < 1.5 || reduce){
+      P.x = P.tx; P.y = P.ty; placePlayer(); playerEl.classList.remove('walking'); walkRAF = null; checkNear();
+      const cb = P.cb; P.cb = null; if (cb) cb(); return;
+    }
+    const v = Math.min(d, 150*dt);
+    P.x += dx/d*v; P.y += dy/d*v; P.ang = Math.atan2(dy, dx)*180/Math.PI + 90;
+    playerEl.classList.add('walking'); placePlayer(); checkNear();
+    walkRAF = requestAnimationFrame(stepWalk);
+  }
+  function checkNear(){
+    ZONES.forEach((z,i) => {
+      const near = Math.hypot(P.x - z.pt[0], P.y - z.pt[1]) < 46;
+      $('#spot'+i).classList.toggle('near', near);
+      if (near && !seen[i] && !S.solved[i] && S.scene === 'map' && !P.cb){
+        seen[i] = true; beep(1320,.06);
+        say('¡Encontraste algo! ' + z.label + '. Tócalo para usarlo.', 'Toca ' + z.label.toLowerCase() + ' para usarlo.');
+      }
+    });
+  }
+  $('#mapInner').addEventListener('pointerdown', e => {
+    if (S.scene !== 'map' || e.target.closest('.spot')) return;
+    const r = $('#mapInner').getBoundingClientRect();
+    const x = (e.clientX - r.left)/r.width*300, y = (e.clientY - r.top)/r.height*400;
+    const m = $('#tapMark'); m.hidden = false; m.style.left = (x/300*100) + '%'; m.style.top = (y/400*100) + '%';
+    m.style.animation = 'none'; void m.offsetWidth; m.style.animation = '';
+    walkTo(x, y);
+  });
+  document.addEventListener('keydown', e => {
+    if (S.scene !== 'map') return;
+    const k = { ArrowUp:[0,-28], ArrowDown:[0,28], ArrowLeft:[-28,0], ArrowRight:[28,0] }[e.key];
+    if (k){ e.preventDefault(); walkTo(P.x + k[0], P.y + k[1]); }
+  });
+  function useSpot(i){
+    if (S.scene !== 'map') return;
+    if (S.solved[i]){ say('Eso ya lo resolviste. ' + (nextHint() || '¡Sigue explorando!')); return; }
+    const z = ZONES[i];
+    walkTo(z.pt[0], z.pt[1], () => enterZone(i));
+  }
+  function nextHint(){
+    const keysDone = S.solved[0] && S.solved[1] && S.solved[2];
+    const order = keysDone ? [3] : [0,1,2];
+    const k = order.find(i => !S.solved[i]);
+    return k === undefined ? null : ZONES[k].hint;
+  }
+  const ROOM_LINES = {
+    first: 'Esta es la sala. Toca el piso para caminar y toca los objetos sospechosos para usarlos.',
+    A: '¡24 en tu pasaporte! Sigue explorando la sala.',
+    B: '¡GENIO sellado! Todavía hay algo por descubrir.',
+    C: '¡7! Pasaporte completo. Ahora busca la bóveda.',
+    back: 'Puedes volver cuando quieras. Sigue explorando.'
+  };
+  function showMap(fromZoom, line){
     S.scene = 'map';
     $$('.scene').forEach(s => s.hidden = true);
     const map = $('#map'), inner = $('#mapInner');
-    renderMap(); map.hidden = false;
+    renderRoom(); map.hidden = false;
     if (fromZoom && !reduce){ inner.classList.add('zoom'); void inner.offsetWidth; requestAnimationFrame(() => inner.classList.remove('zoom')); }
     else inner.classList.remove('zoom');
-    const l = MAP_LINES[Math.min(S.done, 3)]; say(l[0], l[1]);
+    say(line || ROOM_LINES.first, nextHint());
   }
 
   const SCENES = ['#sceneA','#sceneB','#sceneC','#sceneD'];
   const setup = {};
+  let lastZone = -1;
   async function enterZone(i){
     epoch++; const my = epoch;
     stopNoise();
     const z = ZONES[i], inner = $('#mapInner');
-    inner.style.transformOrigin = (z.x/300*100) + '% ' + (z.y/400*100) + '%';
+    inner.style.transformOrigin = ((z.box[0] + z.box[2]/2)/300*100) + '% ' + ((z.box[1] + z.box[3]/2)/400*100) + '%';
     inner.classList.add('zoom'); beep(330,.1);
     await wait(reduce ? 0 : 620); if (my !== epoch) return;
     $('#map').hidden = true;
-    S.scene = z.id; S.zoneStart = performance.now();
+    S.scene = z.id; S.zoneStart = performance.now(); lastZone = i;
     const sc = $(SCENES[i]); sc.hidden = false; sc.scrollTop = 0;
-    sc.querySelectorAll('[data-back]').forEach(b => b.hidden = true);
+    sc.querySelectorAll('[data-back]').forEach(b => { b.hidden = false; b.classList.remove('go'); });
     setup[z.id]();
   }
-  function finishZone(i){
-    const t = performance.now(); S.times[ZONES[i].id] = t - S.zoneStart;
-    S.done = Math.max(S.done, i+1);
-    const b = $(SCENES[i]).querySelector('[data-back]'); if (b){ b.hidden = false; b.focus({preventScroll:true}); }
+  function leaveZone(){
+    if (lastZone < 0 || !S.zoneStart) return;
+    const id = ZONES[lastZone].id; S.times[id] = (S.times[id] || 0) + (performance.now() - S.zoneStart); S.zoneStart = 0;
   }
-  $$('[data-back]').forEach(b => b.addEventListener('click', () => { epoch++; stopNoise(); try { speechSynthesis.cancel(); } catch(e){} showMap(true); }));
+  function finishZone(i){
+    S.solved[i] = true;
+    const b = $(SCENES[i]).querySelector('[data-back]'); if (b){ b.classList.add('go'); b.focus({preventScroll:true}); }
+  }
+  $$('[data-back]').forEach(b => b.addEventListener('click', () => {
+    const i = lastZone; epoch++; stopNoise(); try { speechSynthesis.cancel(); } catch(e){}
+    leaveZone();
+    showMap(true, S.solved[i] ? ROOM_LINES[ZONES[i].id] : ROOM_LINES.back);
+  }));
 
   /* ---------- intro ---------- */
   $('#startBtn').addEventListener('click', () => {
@@ -972,7 +1109,8 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
     $('#digitC').classList.remove('used');
     phone.classList.remove('draggable','dragging'); phone.style.transform = ''; hop.classList.remove('hot');
     $('#beamPath').setAttribute('d',''); $('#beamDot').setAttribute('cx',-20);
-    say('La laptop está dormida y bloqueada. Escribe la palabra clave en una nota del teléfono.', 'La palabra está en la casilla 2 de tu pasaporte. Escríbela en la nota y guárdala.');
+    if (!S.passport[1]) say('La laptop está bloqueada y pide una palabra clave. Si aún no la tienes, búscala en otro lugar de la sala.', 'Vuelve a la sala y busca la palabra. ' + (nextHint() || ''));
+    else say('La laptop está dormida y bloqueada. Escribe la palabra clave en una nota del teléfono.', 'La palabra está en la casilla 2 de tu pasaporte. Escríbela en la nota y guárdala.');
   };
   function saveNote(){
     const v = $('#noteInput').value.trim().toUpperCase();
@@ -1086,18 +1224,21 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
   setup.D = () => {
     unlocked = false; wIdx = [0,0,0]; renderWheels(-1);
     $('#vault').classList.remove('open'); $('#dPrize').hidden = true; $('#toSummary').hidden = true; $('#confetti').innerHTML = '';
-    say('Gira las tres ruedas hasta formar la combinación de tu pasaporte.', 'Usa ▲ y ▼ en cada rueda: número, palabra y dígito, en ese orden.');
+    $('#backD').hidden = false;
+    const missing = S.passport.filter(v => !v).length;
+    if (missing) say('Esta bóveda necesita tres claves y te ' + (missing === 1 ? 'falta 1' : 'faltan ' + missing) + '. Sigue explorando la sala.', 'Vuelve a la sala. ' + (nextHint() || ''));
+    else say('Gira las tres ruedas hasta formar la combinación de tu pasaporte.', 'Usa ▲ y ▼ en cada rueda: número, palabra y dígito, en ese orden.');
   };
   async function openVault(){
     const my = epoch; unlocked = true;
-    S.tEnd = performance.now(); S.times.D = S.tEnd - S.zoneStart;
+    S.tEnd = performance.now(); $('#backD').hidden = true;
     beep(220,.2); await wait(reduce ? 0 : 450); if (my !== epoch) return;
     $('#vault').classList.add('open'); beep(523,.15); beep(659,.15,.12); beep(784,.15,.24); beep(1047,.35,.36);
     confetti();
     say('¡LIBRE! Gracias, equipo. Como prometí, aquí está su recompensa.');
     await wait(reduce ? 0 : 1600); if (my !== epoch) return;
     $('#photoCaption').textContent = '24 · GENIO · 7 · ' + fmt(S.tEnd - S.t0);
-    $('#dPrize').hidden = false; S.done = 4;
+    $('#dPrize').hidden = false; S.solved[3] = true;
     $('#toSummary').hidden = false;
     const sc = $('#sceneD'); sc.scrollTo({ top: sc.scrollHeight, behavior: reduce ? 'auto' : 'smooth' });
   }
@@ -1113,14 +1254,14 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
 
   /* ---------- summary ---------- */
   $('#toSummary').addEventListener('click', () => {
-    epoch++; S.scene = 'end';
+    leaveZone(); epoch++; S.scene = 'end';
     $$('.scene').forEach(s => s.hidden = true); $('#sceneEnd').hidden = false;
     const body = $('#sumBody'); body.innerHTML = ''; let total = 0;
     const keys = ['24','GENIO','7','24-GENIO-7'];
     ZONES.forEach((z,i) => {
       const t = S.times[z.id] || 0; total += t;
       const tr = document.createElement('tr');
-      [z.id + ' · ' + z.name, KIT[i], keys[i]].forEach(v => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
+      [z.spot + ' · ' + z.name, KIT[i], keys[i]].forEach(v => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
       [ROOM_MIN[i], fmt(t)].forEach(v => { const td = document.createElement('td'); td.className = 'num'; td.textContent = v; tr.appendChild(td); });
       body.appendChild(tr);
     });
@@ -1129,7 +1270,8 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
     say('Gracias por liberarme. Cuéntale al equipo qué te pareció la experiencia.');
   });
   $('#restartBtn').addEventListener('click', () => {
-    epoch++; clearPassport(); S.done = 0; S.times = {}; S.t0 = 0; S.tEnd = 0;
+    epoch++; clearPassport(); S.solved = [false,false,false,false]; seen.fill(false); S.times = {}; lastZone = -1;
+    P.x = P.tx = 150; P.y = P.ty = 372; P.ang = 0; placePlayer(); S.t0 = 0; S.tEnd = 0;
     $('#clock').textContent = '12:00'; $('#clockChip').classList.remove('late');
     $('#passport').hidden = true; $('#map').hidden = true;
     $$('.scene').forEach(s => s.hidden = true); $('#intro').hidden = false; S.scene = 'intro';
@@ -1137,12 +1279,12 @@ h2{font-family:var(--display);font-size:clamp(22px,4vw,28px);font-weight:700;mar
   });
 
   /* ---------- boot (keeps progress across live updates) ---------- */
-  window.claude?.hot?.snapshot?.(() => ({ done: S.done, passport: S.passport, started: !!S.t0 }));
+  window.claude?.hot?.snapshot?.(() => ({ solved: S.solved, passport: S.passport, started: !!S.t0 }));
   function start(data){
     data = data || {};
     if (data.started){
       (data.passport || []).forEach((v,i) => { if (v) stamp(i, v, false); });
-      S.done = Math.min(3, data.done || 0); S.t0 = performance.now();
+      if (Array.isArray(data.solved)) S.solved = data.solved.slice(0,4); S.t0 = performance.now();
       $('#intro').hidden = true; $('#passport').hidden = false; showMap(false);
     } else {
       say('¡Psst! Aquí, en la lámpara. Me quedé atrapado en la Bóveda. ¿Me ayudas a salir?');
